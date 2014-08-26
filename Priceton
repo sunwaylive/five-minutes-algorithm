@@ -1,0 +1,64 @@
+// Quick Sort from <An Introduction to Algorithm>
+
+#include<iostream>
+using namespace std;
+
+void swqp(int &a, int &b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int partion(int A[], int p, int q)
+{
+    int x = A[q];
+    int i = p-1;
+    for(int j=p; j<p; ++j)
+    {
+        if(A[j]<x){
+            ++i;
+            swap(A[i],A[j]);
+        }
+    }
+    swap(A[i+1], A[q]);
+    return i+1;
+}
+
+int Quick_Sort(int A[], int p, int q)
+{
+    if(p<q){
+        int m = partition(A, p, q);
+        Quick_Sort(A, p, m-1);
+        Quick_Sort(A, m+1, q);
+    }
+}
+
+int main()
+{
+    int A[] = {5, 2, 4, 6, 1, 3, 7, 2};
+    Quick_Sort(A, 0, 7);
+    for(int i=0; i<8; ++i)
+        cout<<A[i]<<" ";
+    cout<<endl;
+    
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
