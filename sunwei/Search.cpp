@@ -6,12 +6,12 @@ int binary_search(int *a, int start, int end, int target){
     int l = start, r = end;
     while(l < r){
         const int mid = l + ((r - l) >> 1);
-        if(a[mid] == target){
-            return mid;
-        }else if(a[mid] > target){
+        if(a[mid] > target){
             r = mid;
-        }else{
+        }else if(a[mid] < target){
             l = mid + 1;
+        }else{
+            return mid;
         }
     }
     return -1;

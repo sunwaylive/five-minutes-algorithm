@@ -116,15 +116,13 @@ void selection_sort(int *a, int start, int end){
 
     for(int i = start; i < end; ++i){
         int min_idx = i;
-        for(int j = i; j < end; ++j){
+        for(int j = i + 1; j < end; ++j){
             if(a[j] < a[min_idx])
                 min_idx = j;
         }
-
         if(min_idx != i){
             swap(a[i], a[min_idx]);
         }
-
     }
 }
 
