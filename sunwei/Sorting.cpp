@@ -28,15 +28,14 @@ void quick_sort(int *a, int start, int end){
 //kth_small_num(a, n, 0, n, n - k)<<endl;//n - k position holds k-th biggest number
 int kth_small_num(int *a, int n, int start, int end, int k){
     const int pivot_pos = partition(a, start, end);
-    if(pivot_pos == k){
-        return a[pivot_pos];
-    }else if(pivot_pos < k){
+    if(pivot_pos < k){
         return kth_small_num(a, n, pivot_pos + 1, end, k);
-    }else{
+    }else if(pivot_pos > k){
         return kth_small_num(a, n, start, pivot_pos, k);
+    }else{
+        return a[pivot_pos];
     }
 }
-
 //************************************************************
 void bubble_sort(int *a, int start, int end){
     if(a == NULL) return ;
@@ -166,6 +165,8 @@ void shell_sort(int *a, int start, int end){
 //************************************************************
 //array a range: 0 ~ k
 void counting_sort(int *a, int n, int k){
+    if(a == NULL) return;
+
     int *count = (int*) malloc(sizeof(int) * (k + 1));
     memset(count, 0, sizeof(int) * (k + 1));
 
@@ -186,6 +187,24 @@ void counting_sort(int *a, int n, int k){
 
     free(count);
     free(b);
+}
+
+//this one is much better
+void counting_sort2(int *a, int n, int k){
+    if(a == NULL) return;
+
+    int *count = new int[k + 1]();
+    for(int i = 0; i < n; ++i)
+        count[a[i]]++;
+
+    int j = 0;
+    for(int i = 0; i <= k; ++i){
+        while(count[i]-- > 0){
+            a[j++] = i;
+        }
+    }
+
+    delete[] count;
 }
 
 //************************************************************
@@ -226,12 +245,11 @@ void radix_sort(int *a, int n, int d){
 }
 
 int main(){
-    int a[] = {2, 3, 4, 5, 6, 1, 8, 9, 0};
+    int a[] = {3, 5, 1, 4, 5, 6};
     const int n = sizeof(a) / sizeof(a[0]);
-    radix_sort(a, n, 10);
-    for(int i = 0; i < n; ++i){
+    counting_sort2(a, n, 6);
+    for(int i = 0; i < n; ++i)
         cout<<a[i] <<" ";
-    }
     cout<<endl;
     return 0;
 }
