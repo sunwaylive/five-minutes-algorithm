@@ -103,6 +103,42 @@ void Quick3Sort(int A[], int lo, int hi){
 	Quick3Sort(A, gt+1, hi);
 }
 
+
+#define BITS_LENGTH 32
+
+int bucket1[100];
+int bucket2[100];
+
+void RadixSort(int A[], int size){
+	int i;
+	int j;
+	int size1;
+	int size2;
+
+	for(i = 0; i < BITS_LENGTH; i ++){
+		size1 = 0;
+		size2 = 0;
+		for(j = 0; j < size; j ++){
+			if((A[j] >> i) & 1){
+				bucket2[size2++] = A[j];
+			}else{
+				bucket1[size1++] = A[j];
+			}
+		}
+	    int index1 = 0, index2 = 0;
+	    while(index1 < size1){
+	    	A[index1] = bucket1[index1];
+	    	index1 ++;
+	    }
+
+	    while(index2 < size2){
+	    	A[index1 + index2] = bucket2[index2];
+	    	index2 ++;
+	    }
+
+	}
+}
+
 int main(){
 
 	int A[] = {3,8,1,4,3,9,7,1,4,3};
