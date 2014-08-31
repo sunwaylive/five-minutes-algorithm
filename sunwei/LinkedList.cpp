@@ -62,9 +62,8 @@ void delNode(ListNode *&head, ListNode *del){
             prev = prev->next;
 
         if(prev == NULL) return;
-        ListNode *tmp = del;
         prev->next =  del->next;
-        delete tmp;
+        delete del;
         head = dummy.next;
     }
 }
@@ -79,6 +78,8 @@ ListNode* kthNode(ListNode *head, int k){
 
 //************************************************************
 ListNode* findMid(ListNode *head){
+    if(head == NULL && head->next == NULL) return head;
+
     ListNode *slow = head, *fast = head->next;
     while(fast != NULL && fast->next != NULL){
         fast = fast->next->next;
@@ -191,21 +192,17 @@ ListNode* detectCycle(ListNode *head){
 //************************************************************
 ListNode* lastKth(ListNode *head, int k){
     if(head == NULL) return NULL;
-
-    ListNode *fast = head;
-    while(k-- && fast != NULL){
-        fast = fast->next;
-    }
-    //k > length
-    if(fast == NULL && k > 0)
-        return NULL;
-
-    ListNode *slow = head;
+    int cnt = 0;
+    ListNode *fast = head, *slow = head;
     while(fast != NULL){
         fast = fast->next;
-        slow = slow->next;
+        cnt++;
+        if(cnt > k){
+            slow = slow->next;
+        }
     }
-    return slow;
+    if(cnt < k) return NULL;
+    else return slow;
 }
 
 //************************************************************
@@ -220,7 +217,8 @@ void printList(ListNode *head){
 int main()
 {
     ListNode *head = createList(10);
-    ListNode *kth = lastKth(head, 10);
+    printList(head);
+    ListNode *kth = lastKth(head, 1);
     cout<<kth->val <<endl;
     return 0;
 }

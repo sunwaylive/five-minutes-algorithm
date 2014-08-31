@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstdio>
 #include <algorithm>
+#include <iomanip> // for class String
 using namespace std;
 
 char* strstr(char *txt, char *pat){
@@ -75,6 +76,17 @@ int strcmp(const char *str1, const char *str2){
     }
     return *str1 - *str2;
 }
+
+//************************************************************
+void *memcpy(void *dst, const void *src, size_t count){
+    assert(dst != NULL && src != NULL);
+    char *s_dst = (char*)dst, *s_src = (char*)src;
+    for(size_t i = 0; i < count; ++i){
+        s_dst[i] = s_src[i];
+    }
+    return s_dst;
+}
+
 //************************************************************
 size_t strlen(const char *str){
     const char *s;
@@ -129,9 +141,94 @@ int longest_palindrome(char *str){
 }
 
 class String{
+    friend istream& operator>> (istream &, string &);
+    friend ostream& operator<< (ostream &, string &);
+public:
+    String(const char *str = NULL);
+    String(const String &other);
+    ~String(){ delete[] m_data; }
 
+    String& operator=(const String &other);
+    String operator+(const String &other) const;//return value can't be a reference of itself
+    bool operator==(const String &other);
+    char& operator[](unsigned int);
+
+    size_t size(){ return strlen(m_data); }
+private:
+    char *m_data;
 };
 
+inline String::String(const char *str){//because default param is given, this becomes a default cons
+    if(str == NULL) m_data = NULL;
+    else{
+        m_data = new char[strlen(str) + 1];
+        strcpy(m_data, str);
+    }
+}
+
+//copy cons, other can't be itself! No need to delete old memory
+inline String::String(const String &other){
+    if(other.m_data == NULL){
+        m_data = NULL;
+    }else{
+        m_data = new char[strlen(other.m_data) + 1];
+        strcpy(m_data, other.m_data);
+    }
+}
+
+inline String& String::operator=(const String &other){
+    if(&other != this){
+        delete[] m_data;
+        if(other.m_data == NULL){
+            m_data = NULL;
+        }else{
+            m_data = new char[strlen(other.m_data) + 1];
+            strcpy(m_data, other.m_data);
+        }
+    }
+    return *this;
+}
+
+inline String String::operator+(const String &other) const{
+    String newString;
+    if(other.m_data == NULL){
+        newString = *this;
+    }else if(m_data == NULL){
+        newString = other;
+    }else{
+        newString.m_data = new char[strlen(m_data) + strlen(other.m_data) + 1];
+        strcpy(newString.m_data, m_data);
+        strcat(newString.m_data, other.m_data);
+    }
+    return newString;
+}
+
+inline bool String::operator==(const String &other){
+    if(strlen(m_data) != strlen(other.m_data)){
+        return false;
+    }
+    else {
+        return (strcmp(m_data, other.m_data) == 0) ? true : false;
+    }
+}
+
+inline char& String::operator[](unsigned int e){
+    if(e >= 0 && e <= strlen(m_data)){
+        return m_data[e];
+    }
+}
+
+ostream& operator<<(ostream &os, String &str){//this method must be friend function, not member function
+    os<< str.m_data;
+    return os;
+}
+
+istream& operator>>(istream &is, String &str){
+    char tmp[255];
+    is>>setw(255)>>tmp;
+    str = tmp;
+    return is;
+}
 
 int main()
 {

@@ -139,6 +139,7 @@ void dfs(TreeNode *root){
 }
 
 //************************************************************
+//recursive
 void insertBST(TreeNode *&root, TreeNode *newNode){
     if(root == NULL)
         root = newNode;
@@ -146,10 +147,6 @@ void insertBST(TreeNode *&root, TreeNode *newNode){
         insertBST(root->lchild, newNode);
     else if(newNode->val > root->val)
         insertBST(root->rchild, newNode);
-}
-
-void delBST(TreeNode *&root, TreeNode *newNode){
-
 }
 
 bool searchBST(TreeNode *root, int target){
@@ -164,6 +161,104 @@ bool searchBST(TreeNode *root, int target){
     }
 }
 
+//************************************************************
+//iterative
+//remember this instead of above
+TreeNode* searchBSTIterative(TreeNode *root, int val){
+    TreeNode *p = root;
+    while(p != NULL){
+        if(val < p->val){
+            p = p->lchild;
+        }else if(val > p->val){
+            p = p->rchild;
+        }else{
+            return p;
+        }
+    }
+    return NULL;
+}
+
+bool insertBSTIterative(TreeNode *&root, int val){
+    TreeNode *par = NULL;
+    TreeNode *cur = root;
+    while(cur != NULL){
+        if(val < cur->val){
+            par = cur;
+            cur = cur->lchild;
+        }else if (val > cur->val){
+            par = cur;
+            cur = cur->rchild;
+        }else{
+            return false;//如果BST中存在相同则返回false
+        }
+    }
+
+    TreeNode *newNode = new TreeNode(val);
+    if(par == NULL){
+        root = newNode;
+    }else{
+        if(val > par->val){
+            par->rchild = newNode;
+        }else{
+            par->lchild = newNode;
+        }
+    }
+    return true;
+}
+
+bool deleteBSTIterative(TreeNode *&root, int val){
+    //find the node;
+    TreeNode *par = NULL;
+    TreeNode *cur = root;
+    while(cur != NULL){
+        if(val > cur->val){
+            par = cur;
+            cur = cur->rchild;
+        }else if(val < cur->val){
+            par = cur;
+            cur = cur->lchild;
+        }else{
+            //we find it
+            if(cur->lchild == NULL && cur->rchild == NULL){//leaf node
+                if(par == NULL) {
+                    root = NULL;
+                }
+                else {
+                    par->lchild == cur ? (par->lchild = NULL) : (par->rchild = NULL);
+                    delete cur; cur = NULL;
+                }
+            }else if(cur->lchild != NULL && cur->rchild == NULL){//only left child
+                if(par == NULL){//root
+                    root = root->lchild;
+                    delete cur; cur = NULL;
+                }else{
+                    par->lchild == cur ? (par->lchild = cur->lchild) : (par->rchild = cur->lchild);
+                    delete cur; cur = NULL;
+                }
+            }else if(cur->rchild != NULL && cur->lchild == NULL){ //only right child
+                if(par == NULL){//root
+                    root = root->rchild;
+                    delete cur; cur = NULL;
+                }else{
+                    par->lchild == cur ? (par->lchild = cur->rchild) : (par->rchild = cur->rchild);
+                    delete cur; cur = NULL;
+                }
+            }else{//both left and right child
+                TreeNode *left_node = cur->lchild;
+                while(left_node->rchild != NULL){
+                    par = left_node;
+                    left_node = left_node->rchild;
+                }
+                swap(left_node->val, cur->val);
+                par->rchild = left_node->lchild;
+                delete left_node;
+            }
+        }
+    }// end while
+    return false;
+}
+
+//************************************************************
 TreeNode* createBST(){
     TreeNode *root = NULL;
     int data;
@@ -275,6 +370,7 @@ int main()
 {
     ifstream in;
     in.open("input.txt");
+    streambuf *old_cin = cin.rdbuf();
     cin.rdbuf(in.rdbuf());
     TreeNode *root = createTree();
     cout<<"preOrder: ";
@@ -313,5 +409,26 @@ int main()
     cout<<endl <<searchBST(bst, 10) <<endl;
     cout<<searchBST(bst, 5) <<endl;
     bst_in.close();
+
+    //test for iterative BST
+    cout<<"insert BST iterative" <<endl;
+    ifstream bst_in2;
+    bst_in2.open("bst_in.txt");
+    cin.rdbuf(bst_in2.rdbuf());
+
+    TreeNode *r = NULL;
+    int tmp;
+    while(cin>>tmp){
+        insertBSTIterative(r, tmp);
+    }
+    cout<<endl;
+    cout<<"levelOrder:" <<endl;
+    levelOrder(r);
+
+    deleteBSTIterative(r, 0);
+    cout<<"levelOrder:" <<endl;
+    levelOrder(r);
+    bst_in2.close();
     return 0;
+
 }
