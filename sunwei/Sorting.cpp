@@ -26,17 +26,19 @@ void quick_sort(int *a, int start, int end){
     }
 }
 
-//kth_small_num(a, n, 0, n, n - k)<<endl;//n - k position holds k-th biggest number
+//k means dist to start
 int kth_small_num(int *a, int n, int start, int end, int k){
     const int pivot_pos = partition(a, start, end);
-    if(pivot_pos < k){
-        return kth_small_num(a, n, pivot_pos + 1, end, k);
-    }else if(pivot_pos > k){
-        return kth_small_num(a, n, start, pivot_pos, k);
-    }else{
+    int dist = pivot_pos - start + 1;
+    if(dist == k){
         return a[pivot_pos];
+    }else if(dist < k){
+        return kth_small_num(a, n, pivot_pos + 1, end, k - dist);
+    }else {
+        return kth_small_num(a, n, start, pivot_pos, k);
     }
 }
+
 //************************************************************
 void bubble_sort(int *a, int start, int end){
     if(a == NULL) return ;
@@ -248,7 +250,7 @@ void radix_sort(int *a, int n, int d){
 int main(){
     int a[] = {3, 5, 1, 4, 5, 6};
     const int n = sizeof(a) / sizeof(a[0]);
-    quick_sort(a, 0, n);
+    cout<<kth_small_num(a, n, 0, n, 1) <<endl;
     for(int i = 0; i < n; ++i)
         cout<<a[i] <<" ";
     cout<<endl;
