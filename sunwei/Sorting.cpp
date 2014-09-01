@@ -15,6 +15,7 @@ int partition(int *a, int start, int end){
     return l;
 }
 
+
 void quick_sort(int *a, int start, int end){
     if(a == NULL) return ;
 
@@ -142,7 +143,7 @@ void straight_insert_sort(int *a, int start, int end){
 //************************************************************
 void shell_insert(int *a, int start, int end, int gap){
     int i, j;
-    for(i = start + gap; i < end; i += gap){
+    for(i = start + gap; i < end; ++i){
         int tmp = a[i];
         for(j = i - gap; j >= start && tmp < a[j]; j -= gap){
             a[j + gap] = a[j];
@@ -247,7 +248,7 @@ void radix_sort(int *a, int n, int d){
 int main(){
     int a[] = {3, 5, 1, 4, 5, 6};
     const int n = sizeof(a) / sizeof(a[0]);
-    counting_sort2(a, n, 6);
+    quick_sort(a, 0, n);
     for(int i = 0; i < n; ++i)
         cout<<a[i] <<" ";
     cout<<endl;
