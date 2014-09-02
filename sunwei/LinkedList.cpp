@@ -4,7 +4,7 @@ using namespace std;
 struct ListNode{
     int val;
     ListNode *next;
-    ListNode(int x) : val(x){}
+    ListNode(int x) : val(x), next(NULL){}
 };
 
 ListNode* createList(int n){
@@ -18,6 +18,25 @@ ListNode* createList(int n){
     return dummy.next;
 }
 
+//************************************************************
+ListNode* insertAtHead(ListNode *head, int val){
+    ListNode *newNode = new ListNode(val);
+    newNode->next = head;
+    return newNode;
+}
+
+ListNode* insertAtTail(ListNode *head, int val){
+    ListNode dummy(-1);
+    dummy.next = head;
+
+    ListNode *p = &dummy;
+    while(p->next != NULL){
+        p = p->next;
+    }
+    ListNode *newNode = new ListNode(val);
+    p->next = newNode;
+    return dummy.next;
+}
 //************************************************************
 ListNode* reverse(ListNode *head){
     ListNode *pre = NULL, *cur = head, *nxt = NULL;
@@ -216,9 +235,10 @@ void printList(ListNode *head){
 
 int main()
 {
-    ListNode *head = createList(10);
-    printList(head);
-    ListNode *kth = lastKth(head, 1);
-    cout<<kth->val <<endl;
+    ListNode *h = createList(2);
+    ListNode *nh = insertAtHead(h, 100);
+    printList(nh);
+    ListNode *nh2 = insertAtTail(nh, 200);
+    printList(nh2);
     return 0;
 }

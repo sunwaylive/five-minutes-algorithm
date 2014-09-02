@@ -52,10 +52,6 @@ void multiple(int num1[], int num2[], int num3[]){
     }
 }
 
-//O(n)
-void multiple2(int num1[], int num2[], int num3[]){
-
-}
 //************************************************************
 void print(int num[]){
     int i, j;
