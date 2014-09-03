@@ -39,7 +39,7 @@ vector<int> inOrder(TreeNode* root){
 	   vector<int> result;
 	   stack<TreeNode*> nodeStack;
 	   TreeNode* p = root;
-	   while(p != NULL && ! nodeStack.empty() ){
+	   while(p != NULL || ! nodeStack.empty() ){
 		     while(p != NULL){
 				 nodeStack.push(p);
 				 p = p -> left;
