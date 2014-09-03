@@ -11,7 +11,8 @@ struct TreeNode{
     int val;
     TreeNode *lchild, *rchild;
     bool color;//red: 1, black: 0
-    TreeNode(int x, bool c) : val(x), lchild(NULL), rchild(NULL), color(c){}
+    int N;
+    TreeNode(int x, bool c, int s) : val(x), lchild(NULL), rchild(NULL), color(c), N(s){}
 };
 
 //************************************************************
@@ -21,6 +22,11 @@ bool isRed(TreeNode *root){
     else return root->color == RED;
 }
 
+int size(TreeNode *root){
+    if(root == NULL) return 0;
+    else return root->N;
+}
+
 TreeNode* rotateLeft(TreeNode *root){
     assert(root != NULL && isRed(root->rchild));
     TreeNode *rc = root->rchild;
@@ -28,6 +34,10 @@ TreeNode* rotateLeft(TreeNode *root){
     rc->lchild = root;
     rc->color = root->color;
     root->color = RED;
+
+    //change N of the node
+    rc->N = root->N;
+    root->N = size(root->lchild) + size(root->rchild) + 1;
     return rc;
 }
 
@@ -38,6 +48,10 @@ TreeNode* rotateRight(TreeNode *root){
     lc->rchild = root;
     lc->color = root->color;
     root->color = RED;
+
+    //change N of the node
+    lc->N = root->N;
+    root->N = size(root->lchild) + size(root->rchild) + 1;
     return lc;
 }
 
@@ -50,6 +64,33 @@ void flipColors(TreeNode *root){
     root->color = !root->color;
     root->lchild->color = !root->lchild->color;
     root->rchild->color = !root->rchild->color;
+}
+
+//************************************************************
+void insert(TreeNode *&root, int val){
+    if(root == NULL) root = new TreeNode(val, RED, 1);
+    if(val < root->val){
+        insert(root->lchild, val);
+    }else if(val > root->val){
+        insert(root->rchild, val);
+    }else{
+        root->val = val;//overwrite the value
+    }
+
+    if(isRed(root->rchild) && !isRed(root->lchild)) root = rotateLeft(root);
+    if(isRed(root->lchild) && root->lchild != NULL && isRed(root->lchild->lchild)) root = rotateRight(root);
+    if(isRed(root->lchild) && isRed(root->rchild)) flipColors(root);
+    root->N = size(root->lchild) + size(root->rchild) + 1;
+}
+
+
+TreeNode* createRBTree(int n){
+    TreeNode *root = NULL;
+    for(int i = 0; i < n; ++i){
+        insert(root, i);
+        root->color = BLACK;//every time insert, label the root as BLACK
+    }
+    return root;
 }
 
 //************************************************************
@@ -67,29 +108,28 @@ bool search(TreeNode *root, int target){
 }
 
 //************************************************************
-void insert(TreeNode *&root, int val){
-    if(root == NULL) root = new TreeNode(val, RED);
-    if(val < root->val){
-        insert(root->lchild, val);
-    }else if(val > root->val){
-        insert(root->rchild, val);
-    }else{
-        root->val = val;//overwrite the value
-    }
+//rank k means , in inorder traversal, there are k nodes smaller than it;
+TreeNode* selectRank(TreeNode *root, int k){
+    assert(root != NULL && k >= 0);
 
-    if(isRed(root->rchild) && !isRed(root->lchild)) root = rotateLeft(root);
-    if(isRed(root->lchild) && root->lchild != NULL && isRed(root->lchild->lchild)) root = rotateRight(root);
-    if(isRed(root->lchild) && isRed(root->rchild)) flipColors(root);
+    int t = size(root->lchild);
+    if(k > t) return selectRank(root->rchild, k - t - 1);
+    else if(k < t) return selectRank(root->lchild, k);
+    else return root;
 }
 
+//************************************************************
+//assume no duplicates, return the rank of the target value
+int getRank(TreeNode *root, int target){
+    if(root == NULL) return 0;
 
-TreeNode* createRBTree(int n){
-    TreeNode *root = NULL;
-    for(int i = 0; i < n; ++i){
-        insert(root, i);
-        root->color = BLACK;//every time insert, label the root as BLACK
+    if(target > root->val){
+        return size(root->lchild) + 1 + getRank(root->rchild, target);
+    }else if(target < root->val){
+        return getRank(root->lchild, target);
+    }else{
+        return size(root->lchild);
     }
-    return root;
 }
 
 //************************************************************
@@ -101,7 +141,7 @@ void preOrder(TreeNode *root){
     while(!stk.empty()){
         p = stk.top();
         stk.pop();
-        cout<<p->val<<" ";
+        cout<<p->val<<" "<<"rank: " << p->N<<endl;
 
         if(p->rchild != NULL) stk.push(p->rchild);
         if(p->lchild != NULL) stk.push(p->lchild);
@@ -112,5 +152,9 @@ int main()
 {
     TreeNode *root = createRBTree(5);
     preOrder(root);
+    int n;
+    while(cin>>n){
+        cout<<getRank(root, n) <<endl;
+    }
     return 0;
 }
