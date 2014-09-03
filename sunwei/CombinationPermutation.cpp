@@ -84,6 +84,7 @@ vector<int> next_permutation(vector<int> num){
 }
 
 //************************************************************
+//given n:1 ~ 9, find the k-th permutation
 string getPermutation(int n, int k){
     const int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320};//9 numbers, start from 0
     vector<bool> visited(10, false);//1 ~ n
