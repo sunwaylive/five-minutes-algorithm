@@ -295,7 +295,8 @@ int isBalancedHelper(TreeNode *root, bool &is_balanced){
 
 bool isBalanced(TreeNode *root){
     bool is_balanced = true;
-    return isBalancedHelper(root, is_balanced);
+    isBalancedHelper(root, is_balanced);
+    return is_balanced;
 }
 
 //************************************************************
@@ -357,12 +358,10 @@ bool isSymmetricTree(TreeNode *root){
 }
 //************************************************************
 void destroyTree(TreeNode *root){
-    if(root == NULL) return;
-    else if(root->lchild == NULL && root->rchild == NULL){
-        delete root;
-    }
-    if(root->lchild != NULL) destroyTree(root->lchild);
-    if(root->rchild != NULL) destroyTree(root->rchild);
+    if(root == NULL)
+        return;
+    destroyTree(root->lchild);
+    destroyTree(root->rchild);
     delete root;
 }
 
