@@ -7,6 +7,7 @@ int num1[N], num2[N], num3[N];
 int num4[N * 2];// for multiple
 
 //************************************************************
+//default num1 ， num2 >=0
 void add(int num1[], int num2[], int num3[]){
     for(int i = 0; i < N; ++i)
         num3[i] = 0;
@@ -21,7 +22,7 @@ void add(int num1[], int num2[], int num3[]){
 }
 
 //************************************************************
-//default num1 >= num2
+//default num1 >= num2 >=0
 void sub(int num1[], int num2[], int num3[]){
     for(int i = 0; i < N; ++i)
         num3[i] = 0;
@@ -37,6 +38,7 @@ void sub(int num1[], int num2[], int num3[]){
 
 //************************************************************
 //O(n^2)
+//default num1 ， num2 >=0
 void multiple(int num1[], int num2[], int num3[]){
     for(int i = 0; i < N * 2; ++i)//size of num3 is twice of num1 and num2
         num3[i] = 0;
