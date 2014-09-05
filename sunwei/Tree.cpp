@@ -206,56 +206,41 @@ bool insertBSTIterative(TreeNode *&root, int val){
     return true;
 }
 
-bool deleteBSTIterative(TreeNode *&root, int val){
-    //find the node;
-    TreeNode *par = NULL;
-    TreeNode *cur = root;
-    while(cur != NULL){
-        if(val > cur->val){
-            par = cur;
-            cur = cur->rchild;
-        }else if(val < cur->val){
-            par = cur;
-            cur = cur->lchild;
-        }else{
-            //we find it
-            if(cur->lchild == NULL && cur->rchild == NULL){//leaf node
-                if(par == NULL) {
-                    root = NULL;
-                }
-                else {
-                    par->lchild == cur ? (par->lchild = NULL) : (par->rchild = NULL);
-                    delete cur; cur = NULL;
-                }
-            }else if(cur->lchild != NULL && cur->rchild == NULL){//only left child
-                if(par == NULL){//root
-                    root = root->lchild;
-                    delete cur; cur = NULL;
-                }else{
-                    par->lchild == cur ? (par->lchild = cur->lchild) : (par->rchild = cur->lchild);
-                    delete cur; cur = NULL;
-                }
-            }else if(cur->rchild != NULL && cur->lchild == NULL){ //only right child
-                if(par == NULL){//root
-                    root = root->rchild;
-                    delete cur; cur = NULL;
-                }else{
-                    par->lchild == cur ? (par->lchild = cur->rchild) : (par->rchild = cur->rchild);
-                    delete cur; cur = NULL;
-                }
-            }else{//both left and right child
-                TreeNode *left_node = cur->lchild;
-                while(left_node->rchild != NULL){
-                    par = left_node;
-                    left_node = left_node->rchild;
-                }
-                swap(left_node->val, cur->val);
-                par->rchild = left_node->lchild;
-                delete left_node;
-            }
+//************************************************************
+bool delNode(TreeNode *&node){
+    TreeNode *par, *tmp;
+    if(node->rchild == NULL){
+        par = node; node = node->lchild;free(par);
+    }else if(node->lchild == NULL){
+        par = node; node = node->rchild; free(par);
+    }else{//leaf node
+        par = node;
+        TreeNode *tmp = node->lchild;
+        while(tmp->rchild != NULL){
+            par = tmp;
+            tmp = tmp->rchild;
         }
-    }// end while
-    return false;
+        node->val = tmp->val;
+        if(par == node){
+            par->lchild = tmp->lchild;
+        }else{
+            par->rchild = tmp->lchild;
+        }
+        free(tmp);
+    }
+    return true;
+}
+
+bool delBST(TreeNode *&root, int val){
+    if(root == NULL) return false;
+
+    if(val < root->val){
+        return delBST(root->lchild, val);
+    }else if(val > root->val){
+        return delBST(root->rchild, val);
+    }else{
+        return delNode(root);
+    }
 }
 
 //************************************************************
@@ -424,7 +409,7 @@ int main()
     cout<<"levelOrder:" <<endl;
     levelOrder(r);
 
-    deleteBSTIterative(r, 0);
+    delBST(r, 0);
     cout<<"levelOrder:" <<endl;
     levelOrder(r);
     bst_in2.close();
