@@ -5,6 +5,8 @@
 
 using namespace std;
 
+
+//************************************************************
 int longestCommonSubstring(const string &txt, const string &query){
     if(txt.empty() || query.empty()) return 0;
 
@@ -88,17 +90,16 @@ int LIS(int *a, int n){
     if(a == NULL) return 0;
 
     int max_len = 0;
-    int *dp = new int[n + 1];
+    int *dp = new int[n + 1]();
     dp[1] = 1;
     for(int i = 2; i <= n; ++i){
-        int m = 0;//当前最大值
         for(int j = 1; j < i; ++j){
-            if(a[j - 1] < a[i - 1] && dp[j] > m)//大于当前的最大值
-                m = dp[j];
+            if(a[j - 1] < a[i - 1] && dp[j] + 1 > dp[i])//大于当前的最大值
+                dp[i] = dp[j] + 1;
             }
-        dp[i] = m + 1;
         max_len = max(max_len, dp[i]);
     }
+    delete[] dp;
     return max_len;
 }
 
@@ -109,15 +110,14 @@ int LDS(int *a, int n){
     int *dp = new int[n + 1];
     dp[1] = 1;
     for(int i = 2; i <= n; ++i){
-        int m = 0;
         for(int j = 1; j < i; ++j){
-            if(a[j - 1] >= a[i - 1] && dp[j] > m){
-                m = dp[j];
+            if(a[j - 1] >= a[i - 1] && dp[j] + 1 > dp[i]){
+                dp[i] = dp[j] + 1;
             }
         }
-        dp[i] = m + 1;
         max_len = max(max_len, dp[i]);
     }
+    delete[] dp;
     return max_len;
 }
 
@@ -280,6 +280,108 @@ int minCut(const string &str){
 }
 
 //************************************************************
+//贪心法活动选择。活动已经按照结束时间从早到晚 排好序, P225
+//若未排序，则：http://blog.csdn.net/crescent__moon/article/details/8828241
+vector<int> selectActivity(int *s, int *f, int n){
+    vector<int> result;
+    if(s == NULL || f == NULL) return result;
+
+    //第一个必选
+    result.push_back(0);
+    int last_end = f[0];
+    for(int i = 0; i < n; ++i){
+        if(s[i] >= last_end){    //找到余下合理活动中最早结束的那个，合理的意思是 在上一个活动结束后开始。记住 已经排好序
+            result.push_back(i);
+            last_end = f[i];
+        }
+    }
+    cout<<result.size() <<endl;
+    return result;
+}
+
+//************************************************************
+//算法导论 P196, 装配线调度
+//a0, a1: 装配线的装配时间；n，一条装配线上装配点数目； e0，e1 进入装配线的时间， l0 l1:离开装配线的时间， t0， t1：切换装配线的时间
+void printWay(int *l0, int *l1, int n, int line){
+    for(int j = n - 1; j >= 0; --j){
+        cout<<j + 1<<" station is on "<< line<<endl;
+        if(line  == 0)
+            line = l0[j];
+        else
+            line = l1[j];
+    }
+}
+
+int fastestWay(int *a0, int *a1, int n, int e0, int e1, int x0, int x1, int *t0, int *t1){
+    if(a0 == NULL || a1 == NULL || t0 == NULL || t1 == NULL)
+        return INT_MAX;
+    //for printWay
+    int *l0 = new int[n]();
+    int *l1 = new int[n]();
+
+    vector<vector<int> > c(n, vector<int>(n, 0));
+    c[0][0] = e0 + a0[0];
+    c[1][0] = e1 + a1[0];
+    for(int j = 1; j < n; ++j){
+        c[0][j] = min(c[0][j - 1], c[1][j - 1] + t1[j - 1]) + a0[j];
+        c[1][j] = min(c[1][j - 1], c[0][j - 1] + t0[j - 1]) + a1[j];
+        //update l0
+        if(c[0][j - 1] < c[1][j - 1] + t1[j - 1]) l0[j] = 0;
+        else l0[j] = 1;
+
+        //update l1
+        if(c[1][j - 1] < c[0][j - 1] + t0[j - 1]) l1[j] = 1;
+        else l1[j] = 0;
+    }
+
+    if(c[0][n - 1] + x0 < c[1][n - 1] + x1) printWay(l0, l1, n, 0);
+    else printWay(l0, l1, n, 1);
+
+    delete[] l0;
+    delete[] l1;
+    return min(c[0][n - 1] + x0, c[1][n - 1] + x1);
+}
+
+//test program
+// int a1[] = {7, 9, 3, 4, 8, 4};
+// int a2[] = {8, 5, 6, 4, 5, 7};
+// int line_len = sizeof(a1) / sizeof(a1[0]);
+// int t1[] = {0, 2, 3, 1, 3, 4};
+// int t2[] = {0, 2, 1, 2, 2, 1};
+// int e1 = 2, e2 = 4;
+// int l1 = 3, l2 = 2;
+// int fw = fastestWay(a1, a2, line_len, e1, e2, l1, l2, t1, t2);
+// cout<<fw<<endl;
+
+//************************************************************
+//双机调度问题
+//dp[k][i] 表示完成前k个任务， 机器A花费小于或等于i的时间时， 机器B所需要的时间
+//递推公式：dp[k][i] = min{dp[k - 1][i] + tb[k], dp[k - 1][i - ta[k]]};
+int task_schedule(int *ta, int *tb, int n){
+    if( ta == NULL || tb == NULL) return 0;
+    int sa = 0;
+    for(int i = 0; i < n; ++i)
+        sa += ta[i];
+
+    vector<vector<int> > dp(n + 1, vector<int>(sa + 1, 0));
+    for(int k = 1; k <= n; ++k){
+        for(int i = 0; i <= sa; ++i){
+            if(i < ta[k - 1]){//不能放到A上去运行， ta[k - 1]表示第k个任务的运行时间
+                dp[k][i] = dp[k - 1][i] + tb[k - 1];
+            }else{
+                dp[k][i] = min(dp[k - 1][i] + tb[k - 1], dp[k - 1][i - ta[k - 1]]);
+            }
+        }
+    }
+    int result = INT_MAX;
+    for(int i = 0; i <= sa; ++i){
+        int tmp = max(dp[n][i], i);
+        result = min(result, tmp);
+    }
+    return result;
+}
+
+//************************************************************
 void printMatrix(vector<vector<int> > &matrix){
     for(int i = 0; i < matrix.size(); ++i){
         for(int j = 0; j < matrix[i].size(); ++j){
@@ -290,34 +392,9 @@ void printMatrix(vector<vector<int> > &matrix){
 }
 
 int main(){
-    int a[] = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
-    int n = sizeof(a) / sizeof(a[0]);
-    cout<<maxSubArray3(a, 0, n) <<endl;
-
-    string txt("A");
-    string pat("B");
-    cout<<longestCommonSubstring(txt, pat)<<endl;
-
-    int b[] = {1, 7, 3, 5, 9, 4, 8};
-    int n_b = sizeof(b) / sizeof(b[0]);
-    cout<<LIS(b, n_b) <<endl;
-    cout<<LDS(b, n_b) <<endl;
-
-    cout<<editDistance(txt, pat)<<endl;
-
-    cout<<"triangle"<<endl;
-    vector<vector<int> > tri;
-    for(int i = 0; i < 2; ++i){
-        vector<int> tmp;
-        for(int j = 0; j <= i; ++j){
-            tmp.push_back(rand() % 10);
-        }
-        tri.push_back(tmp);
-    }
-    printMatrix(tri);
-    cout<<minimumTotal(tri)<<endl;
-
-    string c("aaa");
-    cout<<minCut(c) <<endl;
+    int ta[] = {2, 5, 7, 10, 5, 2};
+    int tb[] = {3, 8, 4, 11, 3, 4};
+    int n = sizeof(ta) / sizeof(ta[0]);
+    cout<<task_schedule(ta, tb, n) <<endl;
     return 0;
 }

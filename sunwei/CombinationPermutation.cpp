@@ -221,8 +221,8 @@ vector<string> grayCode(int n){
     code.resize(pow(2, n));
 
     if(n == 1){
-        code.push_back(string("0"));
-        code.push_back(string("1"));
+        code[0] = string("0");
+        code[1] = string("1");
         return code;
     }
 
