@@ -357,6 +357,7 @@ int fastestWay(int *a0, int *a1, int n, int e0, int e1, int x0, int x1, int *t0,
 //双机调度问题
 //dp[k][i] 表示完成前k个任务， 机器A花费小于或等于i的时间时， 机器B所需要的时间
 //递推公式：dp[k][i] = min{dp[k - 1][i] + tb[k], dp[k - 1][i - ta[k]]};
+//http://blog.csdn.net/will_lee_buaa/article/details/8531888
 int task_schedule(int *ta, int *tb, int n){
     if( ta == NULL || tb == NULL) return 0;
     int sa = 0;
@@ -382,6 +383,35 @@ int task_schedule(int *ta, int *tb, int n){
 }
 
 //************************************************************
+//http://chenjianneng3.blog.163.com/blog/static/128345126201110174316561/
+//并行机调度, m台机器， n个任务,t为任务的执行时间
+bool cmp(const int &a, const int &b){
+    return a > b;
+}
+
+int parallel_schedule(int *t, int n, int m){
+    if(t == NULL) return 0;
+
+    sort(t, t + n, cmp);
+    int *c = new int[m]();
+    //初始化m个机器执行任务的时间
+    for(int i = 0; i < m; ++i){
+        c[i] = t[i];
+    }
+    //对于剩下的任务，每次从机器中选择当前耗时最短的来执行
+    for(int j = m; j < n; ++j){
+        sort(c, c + m, cmp);
+        c[m - 1] += t[j];
+    }
+    //选出最大的即是所求解
+    sort(c, c + m, cmp);
+    int result = c[0];
+    delete[] c;
+    return result;
+}
+
+
+//************************************************************
 void printMatrix(vector<vector<int> > &matrix){
     for(int i = 0; i < matrix.size(); ++i){
         for(int j = 0; j < matrix[i].size(); ++j){
@@ -392,9 +422,10 @@ void printMatrix(vector<vector<int> > &matrix){
 }
 
 int main(){
-    int ta[] = {2, 5, 7, 10, 5, 2};
-    int tb[] = {3, 8, 4, 11, 3, 4};
-    int n = sizeof(ta) / sizeof(ta[0]);
-    cout<<task_schedule(ta, tb, n) <<endl;
+    int t[] = {10, 8, 3, 1, 7, 5};
+    for(int i = 0; i < 6; ++i)
+        cout<<t[i]<<" ";
+    cout<<endl;
+    cout<<parallel_schedule(t, 6, 2)<<endl;
     return 0;
 }
