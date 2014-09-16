@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 //************************************************************
 int longestCommonSubstring(const string &txt, const string &query){
     if(txt.empty() || query.empty()) return 0;
@@ -19,11 +18,8 @@ int longestCommonSubstring(const string &txt, const string &query){
         tmp.assign(t_len, 0);//clear every time
         for(int j = 0; j < t_len; ++j){
             if(query[i] == txt[j]){
-                if(j == 1){
-                    tmp[j] = 0;
-                }else{
-                    tmp[j] = result[j - 1] + 1;
-                }
+                if(j == 0) tmp[j] = 1;
+                else tmp[j] = result[j - 1] + 1;
             }
 
             if(tmp[j] > max_len){

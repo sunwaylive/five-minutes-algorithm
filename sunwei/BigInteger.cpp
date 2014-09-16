@@ -43,8 +43,8 @@ void multiple(int num1[], int num2[], int num3[]){
     for(int i = 0; i < N * 2; ++i)//size of num3 is twice of num1 and num2
         num3[i] = 0;
 
-    for(int i = 0; i <= N; ++i){
-        for(int j = 0; j <= N; ++j){
+    for(int i = 0; i < N; ++i){
+        for(int j = 0; j < N; ++j){
             num3[i + j] = num1[i] * num2[j] + num3[i + j];
             if(num3[i + j] >= 10){
                 num3[i + j + 1] += num3[i + j] / 10;

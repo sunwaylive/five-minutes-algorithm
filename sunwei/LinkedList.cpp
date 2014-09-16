@@ -49,15 +49,15 @@ ListNode* reverse(ListNode *head){
     return pre;
 }
 
-ListNode* reverse_recur(ListNode *list, ListNode *&head){
-    if(list == NULL || list->next == NULL){
+ListNode* reverse_recur(ListNode *cur, ListNode *&head){
+    if(cur == NULL || cur->next == NULL){
         head->next = NULL;
-        head = list;
-        return list;
+        head = cur;
+        return cur;
     }else{
-        ListNode *tmp = reverse_recur(list->next, head);
-        tmp->next = list;
-        return list;
+        ListNode *tmp = reverse_recur(cur->next, head);
+        tmp->next = cur;
+        return cur;
     }
 }
 // LISTNODE *NH = HEAD;
@@ -239,6 +239,8 @@ int main()
     ListNode *nh = insertAtHead(h, 100);
     printList(nh);
     ListNode *nh2 = insertAtTail(nh, 200);
+    printList(nh2);
+    reverse_recur(nh2, nh2);
     printList(nh2);
     return 0;
 }
