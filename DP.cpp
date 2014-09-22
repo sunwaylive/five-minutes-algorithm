@@ -75,6 +75,37 @@ int longestCommonSubsequence(const string &txt, const string &pat){
     getMaxSequence(pat, b, p_len, t_len);
     return max_len;
 }
+//------------------------------------------------------------
+int max_6(int a1, int a2, int a3, int a4, int a5, int a6){
+    return max(a1, max(a2, max(a3, max(a4, max(a5, a6)))));
+}
+
+int lcsubsequence3(const string &str1, const string &str2, const string &str3){
+    int l1 = str1.length();
+    int l2 = str2.length();
+    int l3 = str3.length();
+    vector<vector<vector<int> > > c(l1 + 1, vector<vector<int> > (l2 + 1, vector<int>(l3 + 1, 0)));
+    for(int i = 1; i <= l1; ++i){
+        for(int j = 1; j <= l2; ++j){
+            for(int k = 1; k <= l3; ++k){
+                if(str1[i - 1] == str2[j - 1] && str2[j - 1] == str3[k - 1]){
+                    c[i][j][k] = c[i - 1][j - 1][k - 1] + 1;
+                }else if(str1[i - 1] == str2[j - 1] && str1[i - 1] != str3[k - 1]){
+                    c[i][j][k] = max(c[i][j][k - 1], c[i - 1][j - 1][k]);
+                }else if(str1[i - 1] == str3[j - 1] && str1[i - 1] != str2[k - 1]){
+                    c[i][j][k] = max(c[i][j - 1][k], c[i - 1][j][k - 1]);
+                }else if(str2[j - 1] == str3[k - 1] && str2[j - 1] != str1[i - 1]){
+                    c[i][j][k] = max(c[i - 1][j][k], c[i][j - 1][k - 1]);
+                }else{
+                    c[i][j][k] = max_6(c[i - 1][j][k], c[i][j - 1][k], c[i][j][k - 1],
+                                     c[i - 1][j - 1][k], c[i][j - 1][k - 1], c[i - 1][j][k - 1]);
+                }
+            }
+        }
+    }
+    return c[l1][l2][l3];
+}
+
 
 //************************************************************
 //http://blog.csdn.net/wangkechuang/article/details/7949151
@@ -418,10 +449,9 @@ void printMatrix(vector<vector<int> > &matrix){
 }
 
 int main(){
-    int t[] = {10, 8, 3, 1, 7, 5};
-    for(int i = 0; i < 6; ++i)
-        cout<<t[i]<<" ";
-    cout<<endl;
-    cout<<parallel_schedule(t, 6, 2)<<endl;
+    string s1("aadsbbbcs");
+    string s2("adsabcs");
+    string s3("adbsbsdcs");
+    cout<<lcsubsequence3(s1, s2, s3);
     return 0;
 }

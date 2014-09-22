@@ -8,6 +8,26 @@
 using namespace std;
 
 //************************************************************
+//分解质因数，1既不是质数也不是合数
+void prim(int n){
+    for(int i = 2; i <= n; ++i){
+        while(n % i == 0){
+            cout<<i<<endl;
+            n /= i;
+        }
+    }
+}
+
+void prim_recur(int n, int m){
+    if(n > m){
+        while(n % m != 0) m++;
+        cout<<m<<endl;
+        n /= m;
+        prim_recur(n, m);
+    }
+}
+
+//************************************************************
 // 1、给定一个字符串，求出其最长的重复子串。
 // 思路：使用后缀数组，对一个字符串生成相应的后缀数组后，然后再排序，排完序依次检测相邻的两个字符串的开头公共部分。 这样的时间复杂度为：
 // 生成后缀数组 O(N)
@@ -313,7 +333,8 @@ SingletonNest* SingletonNest::instance = NULL;
 
 int main()
 {
-    string s("abbbccd");
-    cout<<longestRepeatSubstring(s) <<endl;
+    prim(33);
+    cout<<"**" <<endl;
+    prim_recur(33, 2);
     return 0;
 }
