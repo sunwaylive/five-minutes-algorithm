@@ -1,7 +1,9 @@
 #include <iostream>
+#include <stack>
 #include <algorithm>
 using namespace std;
 
+//************************************************************
 int partition(int *a, int start, int end){
     int l = start, r = end - 1;
     const int pivot_val = a[l];
@@ -25,6 +27,47 @@ void quick_sort(int *a, int start, int end){
         quick_sort(a, pivot_pos + 1, end);
     }
 }
+
+//------------------------------------------------------------
+//non recursive,左闭右开
+void quick_sort2(int *a, int start, int end){
+    stack<int> stk;
+    int l = start, r = end;
+    if(l + 1 < r){
+        //part 1
+        int pivot_pos = partition(a, l, r);
+        if(l + 1 < pivot_pos){
+            stk.push(l);
+            stk.push(pivot_pos);
+        }
+        if(pivot_pos + 1 + 1 < r){
+            stk.push(pivot_pos + 1);
+            stk.push(r);
+        }
+
+        //part 2
+        while(!stk.empty()){
+            r = stk.top();
+            stk.pop();
+            l = stk.top();
+            stk.pop();
+
+            //same with above
+            pivot_pos = partition(a, l, r);
+            if(l + 1 < pivot_pos){
+                stk.push(l);
+                stk.push(pivot_pos);
+            }
+            if(pivot_pos + 1 + 1 < r){
+                stk.push(pivot_pos + 1);
+                stk.push(r);
+            }
+        }
+    }
+}
+
+
+//************************************************************
 
 //k means dist to start
 int kth_small_num(int *a, int n, int start, int end, int k){
@@ -248,9 +291,9 @@ void radix_sort(int *a, int n, int d){
 }
 
 int main(){
-    int a[] = {3, 5, 1, 4, 5, 6};
+    int a[] = {3, 5, 1, 4, 5, 6, 120, 23, 234};
     const int n = sizeof(a) / sizeof(a[0]);
-    cout<<kth_small_num(a, n, 0, n, 1) <<endl;
+    quick_sort2(a, 0, n);
     for(int i = 0; i < n; ++i)
         cout<<a[i] <<" ";
     cout<<endl;
