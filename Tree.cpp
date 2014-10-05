@@ -207,8 +207,32 @@ bool insertBSTIterative(TreeNode *&root, int val){
 }
 
 //************************************************************
+//Given two values, print all the keys in Balanced Search Tree in the range in increasing order
+void searchRangeInBSTHelper(TreeNode *root, vector<int> &result, int &low, int &high){
+    if(root == NULL) return;
+
+    if(root->val >= low && root->val <= high){
+        searchRangeInBSTHelper(root->lchild, result, low, high);
+        result.push_back(root->val);
+        searchRangeInBSTHelper(root->rchild, result, low, high);
+    }else if(root->val > high){
+        searchRangeInBSTHelper(root->lchild, result, low, high);
+    }else if(root->val < low){
+        searchRangeInBSTHelper(root->rchild, result, low, high);
+    }
+}
+
+vector<int> searchRangeInBST(TreeNode *root, int low, int high){
+    vector<int> result;
+    if(root == NULL) return result;
+
+    searchRangeInBSTHelper(root, result, low, high);
+    return result;
+}
+
+//************************************************************
 bool delNode(TreeNode *&node){
-    TreeNode *par, *tmp;
+    TreeNode *par;
     if(node->rchild == NULL){
         par = node; node = node->lchild;free(par);
     }else if(node->lchild == NULL){
@@ -397,7 +421,7 @@ int main()
     //test for iterative BST
     cout<<"insert BST iterative" <<endl;
     ifstream bst_in2;
-    bst_in2.open("bst_in.txt");
+    bst_in2.open("bst_in2.txt");
     cin.rdbuf(bst_in2.rdbuf());
 
     TreeNode *r = NULL;
@@ -409,6 +433,12 @@ int main()
     cout<<"levelOrder:" <<endl;
     levelOrder(r);
 
+    cout<<"Begin to search Range in BST" <<endl;
+    vector<int> rangeResult = searchRangeInBST(r, 4, 22);
+    for(int i = 0; i < rangeResult.size(); ++i){
+        cout<<rangeResult[i] <<" ";
+    }
+    cout<<endl;
     delBST(r, 0);
     cout<<"levelOrder:" <<endl;
     levelOrder(r);
