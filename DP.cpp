@@ -150,7 +150,7 @@ int LDS(int *a, int n){
 
 //************************************************************
 //https://oj.leetcode.com/problems/maximum-subarray/
-//maximum sub array
+//maximum sum subarray
 int maxSubArray(int *a, int n){
     assert(a != NULL);
 
@@ -211,6 +211,35 @@ int maxSubArray3(int *a, int start, int end){
     }else{//only one element
         return max(0, a[start]);
     }
+}
+
+//************************************************************
+//Find the contiguous subarray within an array (containing at least one number)
+//which has the largest product.
+//For example, given the array [2,3,-2,4],
+//the contiguous subarray [2,3] has the largest product = 6.
+//http://www.geeksforgeeks.org/maximum-product-subarray/  in the comment
+int maxProduct(int A[], int n) {
+    if (n == 0) return 0;
+    int maxProduct = A[0];
+    int minProduct = A[0];
+    int maxRes = A[0];
+    for (int i = 1; i < n; i++)
+    {
+        if (A[i] >= 0)
+        {
+            maxProduct = max(maxProduct * A[i], A[i]);
+            minProduct = min(minProduct * A[i], A[i]);
+        }
+        else
+        {
+            int oldmax = maxProduct;
+            maxProduct = max(minProduct * A[i], A[i]);
+            minProduct = min(oldmax * A[i], A[i]);
+        }
+        maxRes = max(maxRes, maxProduct);
+    }
+    return maxRes;
 }
 
 //************************************************************
@@ -449,9 +478,8 @@ void printMatrix(vector<vector<int> > &matrix){
 }
 
 int main(){
-    string s1("aadsbbbcs");
-    string s2("adsabcs");
-    string s3("adbsbsdcs");
-    cout<<lcsubsequence3(s1, s2, s3);
+    int arr[] = {6, -3, -10, 0, 2};
+    int n = sizeof(arr) / sizeof(*arr);
+    cout<<maxProduct(arr, n)<<endl;
     return 0;
 }
