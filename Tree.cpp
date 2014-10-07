@@ -25,6 +25,7 @@ TreeNode* createTree(){
     return T;
 }
 
+//************************************************************
 //1 while
 void preOrder(TreeNode *root){
     if(root == NULL) return ;
@@ -162,6 +163,17 @@ bool searchBST(TreeNode *root, int target){
 }
 
 //************************************************************
+TreeNode* createBST(){
+    TreeNode *root = NULL;
+    int data;
+    while(cin>>data){
+        TreeNode *t = new TreeNode(data);
+        insertBST(root, t);
+    }
+    return root;
+}
+
+//************************************************************
 //iterative
 //remember this instead of above
 TreeNode* searchBSTIterative(TreeNode *root, int val){
@@ -231,6 +243,37 @@ vector<int> searchRangeInBST(TreeNode *root, int low, int high){
 }
 
 //************************************************************
+//You need to find the inorder successor and predecessor of a given key.
+//In case the given key is not found in BST,
+//then return the two values within which this key will lie.
+//Following is the algorithm to reach the desired result. Its a recursive method:
+void findPrevSuc(TreeNode *root, TreeNode *&prev, TreeNode *&suc, int key){
+    if(root == NULL) return ;
+
+    if(root->val == key){
+        if(root->lchild != NULL){
+            TreeNode *tmp = root->lchild;
+            while(tmp != NULL)
+                tmp = tmp->rchild;
+            prev = tmp;
+        }
+
+        if(root->rchild != NULL){
+            TreeNode *tmp = root->rchild;
+            while(tmp != NULL)
+                tmp = tmp->lchild;
+            suc = tmp;
+        }
+    }else if(root->val > key){//go left
+        suc = root;
+        findPrevSuc(root->lchild, prev, suc, key);
+    }else{//go right
+        prev = root;
+        findPrevSuc(root->rchild, prev, suc, key);
+    }
+}
+
+//************************************************************
 bool delNode(TreeNode *&node){
     TreeNode *par;
     if(node->rchild == NULL){
@@ -267,16 +310,7 @@ bool delBST(TreeNode *&root, int val){
     }
 }
 
-//************************************************************
-TreeNode* createBST(){
-    TreeNode *root = NULL;
-    int data;
-    while(cin>>data){
-        TreeNode *t = new TreeNode(data);
-        insertBST(root, t);
-    }
-    return root;
-}
+
 
 //************************************************************
 bool isValid(TreeNode *root, int lower, int upper){
@@ -376,73 +410,13 @@ void destroyTree(TreeNode *root){
 
 int main()
 {
-    ifstream in;
-    in.open("input.txt");
-    streambuf *old_cin = cin.rdbuf();
-    cin.rdbuf(in.rdbuf());
-    TreeNode *root = createTree();
-    cout<<"preOrder: ";
-    preOrder(root);
-    cout<<endl;
-
-    cout<<"inOrder: ";
-    inOrder(root);
-    cout<<endl;
-
-    cout<<"postOrder: ";
-    postOrder(root);
-    cout<<endl;
-
-    cout<<"levelOrder: "<<endl;
-    levelOrder(root);
-
-    cout<<"dfs: ";
-    dfs(root);
-    cout<<endl;
-
-    cout<<"bfs: ";
-    bfs(root);
-    cout<<endl;
-
-    in.close();
-
-    //test for BST
-    ifstream bst_in;
-    bst_in.open("bst_in.txt");
-    cin.rdbuf(bst_in.rdbuf());
-    cout<<endl;
     TreeNode *bst = createBST();
-    cout<<"bst levleOrder: " <<endl;
-    levelOrder(bst);
-    cout<<endl <<searchBST(bst, 10) <<endl;
-    cout<<searchBST(bst, 5) <<endl;
-    bst_in.close();
+    TreeNode *prev = NULL, *suc = NULL;
+    findPrevSuc(bst, prev, suc, 12);
+    if(prev != NULL) cout<< prev->val <<endl;
+    else cout<<"prev NULL" <<endl;
 
-    //test for iterative BST
-    cout<<"insert BST iterative" <<endl;
-    ifstream bst_in2;
-    bst_in2.open("bst_in2.txt");
-    cin.rdbuf(bst_in2.rdbuf());
-
-    TreeNode *r = NULL;
-    int tmp;
-    while(cin>>tmp){
-        insertBSTIterative(r, tmp);
-    }
-    cout<<endl;
-    cout<<"levelOrder:" <<endl;
-    levelOrder(r);
-
-    cout<<"Begin to search Range in BST" <<endl;
-    vector<int> rangeResult = searchRangeInBST(r, 4, 22);
-    for(int i = 0; i < rangeResult.size(); ++i){
-        cout<<rangeResult[i] <<" ";
-    }
-    cout<<endl;
-    delBST(r, 0);
-    cout<<"levelOrder:" <<endl;
-    levelOrder(r);
-    bst_in2.close();
+    if(suc != NULL) cout<< suc->val <<endl;
+    else cout<<"suc NULL" <<endl;
     return 0;
-
 }
