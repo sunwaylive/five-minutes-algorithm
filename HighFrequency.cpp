@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include <set>
 #include <stack>
 #include <algorithm>
 #include <unordered_map>
@@ -8,6 +9,77 @@
 using namespace std;
 
 //************************************************************
+//Union and Intersection of two sorted arrays
+//http://www.geeksforgeeks.org/union-and-intersection-of-two-sorted-arrays-2/
+vector<int> findUnion(int arr1[], int m, int arr2[], int n){
+    vector<int> result;
+    int i = 0, j = 0;
+    while(i < m && j < n){
+        if(arr1[i] < arr2[j]) result.push_back(arr1[i++]);
+        else if(arr1[i] > arr2[j]) result.push_back(arr2[j++]);
+        else{
+            result.push_back(arr1[i]);
+            i++, j++;
+        }
+    }
+
+    while(i < m) result.push_back(arr1[i++]);
+    while(j < n) result.push_back(arr2[j++]);
+    return result;
+}
+
+vector<int> findIntersection(int arr1[], int m, int arr2[], int n){
+    vector<int> result;
+    int i = 0, j = 0;
+    while(i < m && j < n){
+        if(arr1[i] < arr2[j]) i++;
+        else if(arr1[i] > arr2[j]) j++;
+        else{
+            result.push_back(arr1[i]);
+            i++, j++;
+        }
+    }
+    return result;
+}
+
+//Union and Intersection of three sorted arrays
+//http://www.geeksforgeeks.org/union-and-intersection-of-two-sorted-arrays-2/
+set<int> findUnion3(int arr1[], int n1, int arr2[], int n2, int arr3[], int n3){
+    set<int> result;
+    for(int i = 0; i < n1; ++i) result.insert(arr1[i]);
+    for(int i = 0; i < n2; ++i) result.insert(arr2[i]);
+    for(int i = 0; i < n3; ++i) result.insert(arr3[i]);
+    return result;
+}
+
+vector<int> findIntersection3(int arr1[], int n1, int arr2[], int n2, int arr3[], int n3){
+    vector<int> result;
+    int i = 0, j = 0, k = 0;
+    while(i < n1 && j < n2 && k < n3){
+        if(arr1[i] == arr2[j] && arr2[j] == arr3[k]) {
+            result.push_back(arr1[i]);
+            i++, j++, k++;
+        }else if(arr1[i] < arr2[j]){
+            i++;
+        }else if(arr2[j] < arr3[k]){
+            j++;
+        }else{
+            k++;
+        }
+    }
+    return result;
+}
+
+//************************************************************
+bool isPrim(int n){
+    if(n <= 1) return false;
+
+    for(int i = 2; i * i <= n; ++i){
+        if(n % i == 0) return false;
+    }
+    return true;
+}
+
 //分解质因数，1既不是质数也不是合数
 void prim(int n){
     for(int i = 2; i <= n; ++i){
@@ -330,12 +402,23 @@ SingletonNest* SingletonNest::instance = NULL;
 //     }
 // };
 //************************************************************
-
+void printSet(set<int> &array){
+    for(auto it = array.begin(); it != array.end(); ++it){
+        cout<<*it<<" ";
+    }
+    cout<<endl;
+}
 
 int main()
 {
-    prim(33);
-    cout<<"**" <<endl;
-    prim_recur(33, 2);
+    int ar1[] = {1, 5, 10, 20, 40, 80};
+    int ar2[] = {6, 7, 20, 80, 100};
+    int ar3[] = {3, 4, 15, 20, 30, 70, 80, 120};
+    int n1 = sizeof(ar1)/sizeof(ar1[0]);
+    int n2 = sizeof(ar2)/sizeof(ar2[0]);
+    int n3 = sizeof(ar3)/sizeof(ar3[0]);
+
+    set<int> res_union = findUnion3(ar1, n1, ar2, n2, ar3, n3);
+    printSet(res_union);
     return 0;
 }

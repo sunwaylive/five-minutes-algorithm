@@ -140,99 +140,120 @@ int longest_palindrome(char *str){
     return max_len;
 }
 
+//stl 中 string的源代码, stl 中string 是小写的
 class String{
-    friend istream& operator>> (istream &, string &);
-    friend ostream& operator<< (ostream &, string &);
-public:
-    String(const char *str = NULL);
-    String(const String &other);
-    ~String(){ delete[] m_data; }
-
-    String& operator=(const String &other);
-    String operator+(const String &other) const;//return value can't be a reference of itself
-    bool operator==(const String &other);
-    char& operator[](unsigned int);
-
-    size_t size(){ return strlen(m_data); }
 private:
-    char *m_data;
+    unsigned len;
+    char *pbuf;
+public:
+    String() : len(0), pbuf(0){}
+    String(const String&);
+    String& operator=(const String&);
+    ~String();
+
+    String(const char * str);
+    String& operator=(const char *s);
+
+    const char& operator[](unsigned idx) const;
+    char& operator[](unsigned idx);
+
+    bool operator==(const String &other);
+    String operator+(const String &other) const; // return value, not reference
+
+    const char* c_str() const;
+    unsigned length() const;
+    unsigned size() const;
+    friend ostream& operator<<(ostream &os, const String &s);
+    friend istream& operator>>(istream &is, String &s);
 };
 
-inline String::String(const char *str){//because default param is given, this becomes a default cons
-    if(str == NULL) m_data = NULL;
-    else{
-        m_data = new char[strlen(str) + 1];
-        strcpy(m_data, str);
+String::String(const char *str) : len(0), pbuf(0){
+    *this = str;
+}
+
+String::String(const String &s) : len(0), pbuf(0){
+    *this = s;
+}
+
+String::~String(){
+    if(pbuf != 0){
+        delete[] pbuf;
+        pbuf = 0;
     }
 }
 
-//copy cons, other can't be itself! No need to delete old memory
-inline String::String(const String &other){
-    if(other.m_data == NULL){
-        m_data = NULL;
-    }else{
-        m_data = new char[strlen(other.m_data) + 1];
-        strcpy(m_data, other.m_data);
-    }
-}
-
-inline String& String::operator=(const String &other){
-    if(&other != this){
-        delete[] m_data;
-        if(other.m_data == NULL){
-            m_data = NULL;
-        }else{
-            m_data = new char[strlen(other.m_data) + 1];
-            strcpy(m_data, other.m_data);
-        }
-    }
+String& String::operator=(const char *s){
+    this->~String();
+    len = strlen(s);
+    pbuf = strcpy(new char[len + 1], s);
     return *this;
 }
 
-inline String String::operator+(const String &other) const{
+String& String::operator=(const String &s){
+    if(&s == this)
+        return *this;
+    this->~String();
+    len = s.len;
+    pbuf = strcpy(new char[len + 1], s.pbuf);
+    return *this;
+}
+
+const char& String::operator[](unsigned idx) const{
+    return pbuf[idx];
+}
+
+char& String::operator[](unsigned idx){
+    return pbuf[idx];
+}
+
+String String::operator+(const String &other) const{
     String newString;
-    if(other.m_data == NULL){
+    if(other.pbuf == NULL){
         newString = *this;
-    }else if(m_data == NULL){
+    }else if(this->pbuf == NULL){
         newString = other;
     }else{
-        newString.m_data = new char[strlen(m_data) + strlen(other.m_data) + 1];
-        strcpy(newString.m_data, m_data);
-        strcat(newString.m_data, other.m_data);
+        newString.pbuf = new char[strlen(pbuf) + strlen(other.pbuf) + 1];
+        strcpy(newString.pbuf, pbuf);
+        strcat(newString.pbuf, other.pbuf);
     }
     return newString;
 }
 
-inline bool String::operator==(const String &other){
-    if(strlen(m_data) != strlen(other.m_data)){
-        return false;
-    }
-    else {
-        return (strcmp(m_data, other.m_data) == 0) ? true : false;
-    }
+bool String::operator==(const String &other){
+    if(strlen(pbuf) != strlen(other.pbuf)) return false;
+    else return (strcmp(pbuf, other.pbuf) == 0 ? true : false);
 }
 
-inline char& String::operator[](unsigned int e){
-    if(e >= 0 && e <= strlen(m_data)){
-        return m_data[e];
-    }
+const char* String::c_str() const{
+    return pbuf;
 }
 
-ostream& operator<<(ostream &os, String &str){//this method must be friend function, not member function
-    os<< str.m_data;
+unsigned String::length() const{
+    return len;
+}
+
+unsigned String::size() const{
+    return len;
+}
+
+ostream& operator<<(ostream &os, const String &s){
+    os<<s.c_str();
     return os;
 }
 
-istream& operator>>(istream &is, String &str){
-    char tmp[255];
-    is>>setw(255)>>tmp;
-    str = tmp;
+istream& operator>>(istream &is, String &s){
+    //cout<<"here: " <<endl;
+    char temp[256];
+    is>>setw(256)>>temp;
+    s = temp;
     return is;
 }
 
 int main()
 {
-    char str[] = "abcaaabaabcabc";
-    cout<<longest_palindrome(str)<<endl;
+    String s1 = "hello";
+    String s2 = "hello";
+    cout<<(s1 == s2) <<endl;
     return 0;
 }
