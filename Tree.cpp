@@ -9,6 +9,7 @@ struct TreeNode{
     int val;
     TreeNode *lchild, *rchild;
     TreeNode(int x) : val(x), lchild(NULL), rchild(NULL){}
+    TreeNode(TreeNode *l = NULL, TreeNode *r = NULL): lchild(l), rchild(r){}
 };
 
 TreeNode* createTree(){
@@ -253,14 +254,14 @@ void findPrevSuc(TreeNode *root, TreeNode *&prev, TreeNode *&suc, int key){
     if(root->val == key){
         if(root->lchild != NULL){
             TreeNode *tmp = root->lchild;
-            while(tmp != NULL)
+            while(tmp->lchild != NULL)
                 tmp = tmp->rchild;
             prev = tmp;
         }
 
         if(root->rchild != NULL){
             TreeNode *tmp = root->rchild;
-            while(tmp != NULL)
+            while(tmp->rchild != NULL)
                 tmp = tmp->lchild;
             suc = tmp;
         }
@@ -280,14 +281,14 @@ bool delNode(TreeNode *&node){
         par = node; node = node->lchild;free(par);
     }else if(node->lchild == NULL){
         par = node; node = node->rchild; free(par);
-    }else{//leaf node
+    }else{//internal node
         par = node;
         TreeNode *tmp = node->lchild;
         while(tmp->rchild != NULL){
-            par = tmp;
+            par = tmp;//update parent
             tmp = tmp->rchild;
         }
-        node->val = tmp->val;
+        node->val = tmp->val;//replace
         if(par == node){
             par->lchild = tmp->lchild;
         }else{
@@ -309,8 +310,6 @@ bool delBST(TreeNode *&root, int val){
         return delNode(root);
     }
 }
-
-
 
 //************************************************************
 bool isValid(TreeNode *root, int lower, int upper){
@@ -399,6 +398,27 @@ bool isSymmetricTree(TreeNode *root){
     if(root == NULL) return true;
     else return isSymmetricTree(root->lchild, root->rchild);
 }
+
+//************************************************************
+//破坏原来的树
+TreeNode* getSymmetricTree(TreeNode *&root){
+    if(root == NULL) return root;
+
+    TreeNode *l = getSymmetricTree(root->lchild);
+    TreeNode *r = getSymmetricTree(root->rchild);
+    root->lchild = r;
+    root->rchild = l;
+    return root;
+}
+//不破坏原来的树
+TreeNode* getSymmetricTree2(TreeNode *root){
+    if(root == NULL) return root;
+
+    TreeNode *rootCopy = new TreeNode(root->val);
+    rootCopy->lchild = getSymmetricTree2(rootCopy->rchild);
+    rootCopy->rchild = getSymmetricTree2(rootCopy->lchild);
+    return rootCopy;
+}
 //************************************************************
 void destroyTree(TreeNode *root){
     if(root == NULL)
@@ -408,15 +428,215 @@ void destroyTree(TreeNode *root){
     delete root;
 }
 
+///////////////////////////advanced//////////////////////////
+//************************************************************
+//完全二叉树
+bool isCompleteTree(TreeNode *root){
+    if(root == NULL) return true;
+
+    queue<TreeNode*> que;
+    TreeNode *p = root;
+    que.push(p);
+    bool see_unfull = false;
+    while(!que.empty()){
+        p = que.front();
+        que.pop();
+
+        //left
+        if(p->lchild != NULL){
+            if(see_unfull) return false;
+            else que.push(p->lchild);
+        }else{
+            see_unfull = true;
+        }
+        //right
+        if(p->rchild != NULL){
+            if(see_unfull) return false;
+            else que.push(p->rchild);
+        }else{
+            see_unfull = true;
+        }
+    }
+    return true;
+}
+
+//https://oj.leetcode.com/problems/flatten-binary-tree-to-linked-list/
+//not in ordered
+void flatten(TreeNode *root){
+    if(root == NULL) return;
+
+    flatten(root->lchild);
+    flatten(root->rchild);
+
+    //flatten process
+    if(root->lchild != NULL){
+        TreeNode *tmp = root->lchild;
+        while(tmp->rchild != NULL)
+            tmp = tmp->rchild;
+
+        tmp->rchild = root->rchild;
+        root->rchild = tmp;
+        root->lchild = NULL;
+    }
+}
+
+//http://www.cnblogs.com/remlostime/archive/2012/10/29/2745300.html
+//convert BST to double linked list
+TreeNode convert(TreeNode *root){
+    if(root == NULL){
+        return TreeNode();
+    }
+
+    //flatten process
+    TreeNode ltree = convert(root->lchild);
+    TreeNode rtree = convert(root->rchild);
+    root->lchild = ltree.rchild;//left
+    if(ltree.rchild != NULL)
+        ltree.rchild->rchild = root;
+
+    root->rchild = rtree.lchild;//right
+    if(rtree.lchild != NULL)
+        rtree.lchild->lchild = root;
+
+    //as whole
+    TreeNode *l = ltree.lchild == NULL ? root : ltree.lchild;
+    TreeNode *r = rtree.rchild == NULL ? root : rtree.rchild;
+    return TreeNode(l, r);
+}
+
+TreeNode* convert2DoubleList(TreeNode *root){
+    TreeNode ret = convert(root);
+    return ret.lchild;
+}
+
+//test program
+// TreeNode *bst = createBST();
+// TreeNode *h = convert2DoubleList(bst);
+// while(h != NULL){
+//     cout<<h->val <<" ";
+//     h = h->rchild;
+//  }
+// cout<<endl;
+
+//************************************************************
+//find the first common ancestor of two nodes
+bool isFather(TreeNode *f, TreeNode *s){
+    if(f == NULL) return false;
+    else if(f == s) return true;
+    else return isFather(f->lchild, s) || isFather(f->rchild, s);
+}
+
+void commonAncestor(TreeNode *root, TreeNode *n1, TreeNode *n2, TreeNode *&ans){
+    if(root == NULL || n1 == NULL || n2 == NULL) return ;
+
+    if(isFather(root, n1) && isFather(root, n2)){
+        ans = root;
+        commonAncestor(root->lchild, n1, n2, ans);
+        commonAncestor(root->rchild, n1, n2, ans);
+    }
+}
+
+//************************************************************
+//树中两节点间的最大距离
+
+
+//************************************************************
+//build tree from preorder and inorder
+TreeNode* build(vector<int> &preorder, int pl, int pr,
+                vector<int> &inorder, int il, int ir){
+    TreeNode *root;
+    if(pl > pr || il > ir){
+        root = NULL;
+    }else {
+        root = new TreeNode(preorder[pl]);
+        int i;
+        for(i = il; i <= ir && inorder[i] != root->val; ++i)
+            ;
+        root->lchild = build(preorder, pl + 1, pl + i - il, inorder, il, i - 1);
+        root->rchild = build(preorder, pl + i - il + 1, pr, inorder, i + 1, ir);
+    }
+    reutrn root;
+}
+
+TreeNode* buildTree(vector<int> &preorder, vector<int> &inorder){
+    return build(preorder, 0, preorder.size() - 1,
+                 inorder, 0, inorder.size() - 1);
+}
+
+//************************************************************
+//build tree from inorder and postorder
+TreeNode* build2(vector<int> &inorder, int il, int ir,
+                 vector<int> &postorder, int pl, int pr){
+    TreeNode *root;
+    if(il > ir || pl > pr){
+        root = NULL;
+    }else{
+        root = new TreeNode(postorder[pr]);
+        int i;
+        for(i = il; i <= ir && inorder[i] != root->val; ++i)
+            ;
+        root->lchild = build(inorder, il, i - 1, postorder, pl, i - il + pl - 1);
+        root->rchild = build(inorder, i + 1, ir, postorder, i - il + pl, pr - 1);
+    }
+    return root;
+}
+
+
+//************************************************************
+/*
+ *  * 12. 求二叉树中节点的最大距离：getMaxDistanceRec
+ *
+ *  首先我们来定义这个距离：
+ *  距离定义为：两个节点间边的数目.
+ *  如：
+ *     1
+ *    / \
+ *   2   3
+ *        \
+ *         4
+ *   这里最大距离定义为2，4的距离，为3.
+ * 求二叉树中节点的最大距离 即二叉树中相距最远的两个节点之间的距离。 (distance / diameter)
+ * 递归解法：
+ * 返回值设计：
+ * 返回1. 深度， 2. 当前树的最长距离
+ * (1) 计算左子树的深度，右子树深度，左子树独立的链条长度，右子树独立的链条长度
+ * (2) 最大长度为三者之最：
+ *    a. 通过根节点的链，为左右深度+2
+ *    b. 左子树独立链
+ *    c. 右子树独立链。
+ *
+ * (3)递归初始条件：
+ *   当root == null, depth = -1.maxDistance = -1;
+ */
+struct Result{
+    int maxDist;
+    int depth;
+    Result(int dist = -1, int depth = -1) : maxDist(dist), depth(depth){}
+};
+
+Result getMaxDistHelper(TreeNode *root){
+    Result res;
+    if(root == NULL) return res;
+
+    Result l = getMaxDistHelper(root->lchild);
+    Result r = getMaxDistHelper(root->rchild);
+    res.depth = max(l.depth, r.depth) + 1;
+
+    int cross = l.maxDist + 1 + r.maxDist + 1;
+    res.maxDist = max(cross, max(l.maxDist, r.maxDist));
+    return res;
+}
+
+int getMaxDist(TreeNode *root){
+    return getMaxDistHelper(root).maxDist;
+}
+
+//************************************************************
+
 int main()
 {
     TreeNode *bst = createBST();
-    TreeNode *prev = NULL, *suc = NULL;
-    findPrevSuc(bst, prev, suc, 12);
-    if(prev != NULL) cout<< prev->val <<endl;
-    else cout<<"prev NULL" <<endl;
-
-    if(suc != NULL) cout<< suc->val <<endl;
-    else cout<<"suc NULL" <<endl;
+    TreeNode *sym = getSymmetricTree(bst);
+    levelOrder(sym);
     return 0;
 }

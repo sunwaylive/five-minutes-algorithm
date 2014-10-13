@@ -181,7 +181,7 @@ String::~String(){
         pbuf = 0;
     }
 }
-
+//this is not the best, use "copy and swap" is better to avoid exception in new operator
 String& String::operator=(const char *s){
     this->~String();
     len = strlen(s);
