@@ -555,7 +555,7 @@ TreeNode* build(vector<int> &preorder, int pl, int pr,
         root->lchild = build(preorder, pl + 1, pl + i - il, inorder, il, i - 1);
         root->rchild = build(preorder, pl + i - il + 1, pr, inorder, i + 1, ir);
     }
-    reutrn root;
+    return root;
 }
 
 TreeNode* buildTree(vector<int> &preorder, vector<int> &inorder){
@@ -620,10 +620,10 @@ Result getMaxDistHelper(TreeNode *root){
 
     Result l = getMaxDistHelper(root->lchild);
     Result r = getMaxDistHelper(root->rchild);
-    res.depth = max(l.depth, r.depth) + 1;
+    res.depth = max(l.depth, r.depth) + 1;//1.update depth
 
-    int cross = l.maxDist + 1 + r.maxDist + 1;
-    res.maxDist = max(cross, max(l.maxDist, r.maxDist));
+    int cross = l.depth + 1 + r.depth + 1;//对于一个跨点的路径，跟左右的最大深度有关
+    res.maxDist = max(cross, max(l.maxDist, r.maxDist));//2.update max dist
     return res;
 }
 
@@ -636,7 +636,6 @@ int getMaxDist(TreeNode *root){
 int main()
 {
     TreeNode *bst = createBST();
-    TreeNode *sym = getSymmetricTree(bst);
-    levelOrder(sym);
+    cout<<getMaxDist(bst) <<endl;
     return 0;
 }

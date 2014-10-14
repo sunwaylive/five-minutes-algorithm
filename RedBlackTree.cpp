@@ -29,13 +29,14 @@ int size(TreeNode *root){
 
 TreeNode* rotateLeft(TreeNode *root){
     assert(root != NULL && isRed(root->rchild));
+    //link
     TreeNode *rc = root->rchild;
     root->rchild = rc->lchild;
     rc->lchild = root;
+    //color
     rc->color = root->color;
     root->color = RED;
-
-    //change N of the node
+    //size
     rc->N = root->N;
     root->N = size(root->lchild) + size(root->rchild) + 1;
     return rc;
@@ -43,13 +44,14 @@ TreeNode* rotateLeft(TreeNode *root){
 
 TreeNode* rotateRight(TreeNode *root){
     assert(root != NULL && isRed(root->lchild));
+    //link
     TreeNode *lc = root->lchild;
     root->lchild = lc->rchild;
     lc->rchild = root;
+    //color
     lc->color = root->color;
     root->color = RED;
-
-    //change N of the node
+    //size
     lc->N = root->N;
     root->N = size(root->lchild) + size(root->rchild) + 1;
     return lc;
@@ -67,14 +69,16 @@ void flipColors(TreeNode *root){
 }
 
 //************************************************************
-void insert(TreeNode *&root, int val){
-    if(root == NULL) root = new TreeNode(val, RED, 1);
-    if(val < root->val){
-        insert(root->lchild, val);
-    }else if(val > root->val){
-        insert(root->rchild, val);
+void insert(TreeNode *&root, TreeNode *newNode){
+    if(root == NULL)
+        root = newNode;
+
+    if(newNode->val < root->val){
+        insert(root->lchild, newNode);
+    }else if(newNode->val > root->val){
+        insert(root->rchild, newNode);
     }else{
-        root->val = val;//overwrite the value
+        root->val = newNode->val;//overwrite the value
     }
 
     if(isRed(root->rchild) && !isRed(root->lchild)) root = rotateLeft(root);
@@ -87,7 +91,8 @@ void insert(TreeNode *&root, int val){
 TreeNode* createRBTree(int n){
     TreeNode *root = NULL;
     for(int i = 0; i < n; ++i){
-        insert(root, i);
+        TreeNode *newNode = new TreeNode(i, RED, 1);
+        insert(root, newNode);
         root->color = BLACK;//every time insert, label the root as BLACK
     }
     return root;
@@ -108,7 +113,7 @@ bool search(TreeNode *root, int target){
 }
 
 //************************************************************
-//rank k means , in inorder traversal, there are k nodes smaller than it;
+//rank k means: in inorder traversal, there are k nodes smaller than it;
 TreeNode* selectRank(TreeNode *root, int k){
     assert(root != NULL && k >= 0);
 
@@ -141,7 +146,7 @@ void preOrder(TreeNode *root){
     while(!stk.empty()){
         p = stk.top();
         stk.pop();
-        cout<<p->val<<" "<<"rank: " << p->N<<endl;
+        cout<<p->val<<" "<<"size: " << p->N<<endl;
 
         if(p->rchild != NULL) stk.push(p->rchild);
         if(p->lchild != NULL) stk.push(p->lchild);
