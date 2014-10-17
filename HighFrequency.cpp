@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <unordered_map>
 #include <string>
+#include <map>
+
 using namespace std;
 
 //************************************************************
@@ -80,6 +82,22 @@ bool isPrim(int n){
     return true;
 }
 
+//************************************************************
+//筛数法，求N以内的所有素数, n > 2;
+vector<int> getAllPrim(int n){
+    vector<int> res;
+
+    vector<bool> isPrime(n + 1, false);
+    for(int i = 2; i * i <= n; ++i){
+        for(int j = 1; j * i <= n; ++j){
+            if(isPrime[j * i] && (n % (j * i) == 0))
+                isPrime[j * i] = true;
+        }//end for j
+    }//end for i
+
+}
+
+//************************************************************
 //分解质因数，1既不是质数也不是合数
 void prim(int n){
     for(int i = 2; i <= n; ++i){
@@ -132,7 +150,7 @@ string longestRepeatSubstring(string &str){
 //波兰表达式:前缀表达式；逆波兰表达式:后缀表达式
 
 /*1.中缀表达式求值，先中缀转后缀，基于后缀表达式计算值
-  使用两个栈，操作符栈，操作数栈，从左往右扫描表达式，遇到操作数直接压入操作数栈，遇到操作符，跟操作符栈栈顶元素比较优先级，当且仅当当前操作符比栈顶大的时候，直接压栈(如果小于或者等于栈顶元素，则弹出栈顶元素，将其压入操作数栈)，优先级(乘除 > 加减 > 等号),等号优先级最低 */
+  使用两个栈，操作符栈，操作数栈，从左往右扫描表达式，遇到操作数直接压入操作数栈，遇到操作符，跟操作符栈栈顶元素比较优先级，当且仅当当前操作符比栈顶小的时候，直接压栈(如果大于或者等于栈顶元素，则弹出栈顶元素，将其压入操作数栈，类似保持金字塔形式)，优先级(乘除 > 加减 > 等号),等号优先级最低 */
 
 /*2.将一个 逆波兰式(后缀表达式) 转回 中缀表达式 的算法：
   这个就相当简单了，就是一个机械的入堆栈出堆栈的操作，
@@ -146,6 +164,39 @@ string longestRepeatSubstring(string &str){
   表达式树特点，操作数必定在叶节点，操作符必定在内部节点。
   过程：选最后一个计算的符号，放在根节点，该运算符的左半部分放在左子树，有半部分放在由子树，递归直至结束
 */
+
+vector<string> inToPost(vector<string> &expression){
+    vector<string> post;
+    if(expression.empty()) return post;
+
+    map<char, int> cache;
+    cache['+'] = 0;
+    cache['-'] = 0;
+    cache['*'] = 1;
+    cache['/'] = 1;
+
+    stack<char> oper;
+    stack<int> opnd;
+    for(int i = 0; i < (int)expression.size(); ++i){
+        string tmp = expression[i];
+        if(tmp.size() == 1 && tmp[0] == '+' && tmp[0] == '-'
+           && tmp[0] == '*' && tmp[0] == '/'){
+            while(!oper.empty()){
+                if(cache[tmp[0]] < cache[oper.top()])
+                    break;
+
+                string op;
+                op[0] = tmp[0];//char to string
+                post.push_back(op);
+                oper.pop();
+            }
+            oper.push(tmp[0]);
+        }else{
+            post.push_back(expression[i]);
+        }
+    }//end for
+    return post;
+}
 
 //************************************************************
 //正负交替

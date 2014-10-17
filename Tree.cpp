@@ -255,14 +255,14 @@ void findPrevSuc(TreeNode *root, TreeNode *&prev, TreeNode *&suc, int key){
         if(root->lchild != NULL){
             TreeNode *tmp = root->lchild;
             while(tmp->lchild != NULL)
-                tmp = tmp->rchild;
+                tmp = tmp->lchild;
             prev = tmp;
         }
 
         if(root->rchild != NULL){
             TreeNode *tmp = root->rchild;
             while(tmp->rchild != NULL)
-                tmp = tmp->lchild;
+                tmp = tmp->rchild;
             suc = tmp;
         }
     }else if(root->val > key){//go left
