@@ -58,7 +58,7 @@ void heap_sift_up(const heap_t *h, const int start)
         if(h->elems[i] < tmp){
             break;
         }else{
-            h->elems[i] = h->elems[j];
+            h->elems[j] = h->elems[i];
             j = i;
             i = (j - 1) / 2;
         }
