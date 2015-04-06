@@ -124,21 +124,29 @@ char* leftRotate(char *str, int k){
     return str;
 }
 //************************************************************
-int longest_palindrome(char *str){
-    if(str == NULL) return 0;
-    const int len = strlen(str);
-    int max_len = 0;
-    for(int i = 0; i < len; ++i){
-        int hui_len = 1;
-        int l = i - 1, r = i + 1;
-        while(l >= 0 && r < len && str[l] == str[r]){
-            l--, r++;
-        }
-        hui_len = r - l + 1 - 2;
-        max_len = max(hui_len, max_len);
-    }
-    return max_len;
+int longest_palindrome(const char *str){
+  if(str == NULL) return 0;
+  const int len = strlen(str);
+  int max_hui_len = 0;
+
+  for(int i = 0; i < len; ++i){
+    int hui_len = 1;
+    int l = i - 1, r = i + 1; //odd
+    while(l >= 0 && r < len && str[l] == str[r])
+      l--, r++;
+    hui_len = r - l + 1 - 2;
+    max_hui_len = max(hui_len, max_hui_len);
+
+    l = i, r = i + 1; //even
+    while(l >= 0 && r < len && str[l] == str[r])
+      l--, r++;
+
+    hui_len = r - l + 1 - 2;
+    max_hui_len = max(hui_len, max_hui_len);
+  }
+  return max_hui_len;
 }
+
 
 //stl 中 string的源代码, stl 中string 是小写的
 class String{
@@ -255,5 +263,6 @@ int main()
     String s1 = "hello";
     String s2 = "hello";
     cout<<(s1 == s2) <<endl;
+    cout<<longest_palindrome("hello") <<endl;
     return 0;
 }
