@@ -17,6 +17,25 @@ int binary_search(int *a, int start, int end, int target){
     return -1;
 }
 
+int binary_search_recursive(int *a, int start, int end, int target) {
+    if(a == NULL) {
+        return -1;
+    }
+
+    if (start >= end) {
+        return -1;
+    }
+
+    int mid = start + (end - start) / 2;
+    if (a[mid] > target) {
+        return binary_search_recursive(a, start, mid, target);
+    } else if (a[mid] < target) {
+        return binary_search_recursive(a, mid + 1, end, target);
+    } else {
+        return mid;
+    }
+}
+
 //************************************************************
 int binary_search_rotated(int *a, int start, int end, int target){
     if(a == NULL) return -1;
@@ -75,8 +94,9 @@ int main()
     int a[] = {4, 5, 6, 1, 2, 3};
     int n = sizeof(a) / sizeof(*a);
     cout<<binary_search_rotated(a, 0, n, 14) <<endl;
-    char s[] = "abcde";
-    cout<<strlen(s)<<endl;
-    cout<<sizeof(s) <<endl;
+
+    int b[] = {1, 2, 3, 4, 5};
+    int nb = sizeof(b) / sizeof(*b);
+    cout <<"bs recursive: " << binary_search_recursive(b, 0, 5, 3) <<endl;
     return 0;
 }

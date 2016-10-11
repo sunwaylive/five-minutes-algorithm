@@ -49,41 +49,54 @@ ListNode* reverse(ListNode *head){
     return pre;
 }
 
-ListNode* reverse_recur(ListNode *cur, ListNode *&head){
-    if(cur == NULL || cur->next == NULL){
-        head->next = NULL;
-        head = cur;
-        return cur;
-    }else{
-        ListNode *tmp = reverse_recur(cur->next, head);
-        tmp->next = cur;
-        return cur;
+ListNode* reverse_recur(ListNode *head, ListNode *&new_head) {
+    if (head == NULL) {
+        return NULL;
     }
+
+    //head keep moving ahead, and arrive at the end node
+    if (head->next == NULL) {
+        //end of the old list is the new head
+        new_head = head;
+        return head;
+    }
+
+    ListNode *new_tail = reverse_recur(head->next, new_head);
+    new_tail->next = head;
+    head->next = NULL;
+    return head; // this is used as new_tail for the prev function call
 }
-// LISTNODE *NH = HEAD;
-// REVERSE_RECUR(NH, NH);
 
 //************************************************************
 //O(1)
-void delNode(ListNode *&head, ListNode *del){
-    if(head == NULL || del == NULL) return;
+bool delNode(ListNode *&head, ListNode *del){
+    if(head == NULL || del == NULL) {
+        return false;
+    }
 
-    if(del->next != NULL){
+    if(del->next != NULL) {
         del->val = del->next->val;
         ListNode *tmp = del->next;
         del->next = del->next->next;
         delete tmp;
-    }else{// the last node
+        return true;
+    } else {// the last node
         ListNode dummy(-1);
         dummy.next = head;
         ListNode *prev = &dummy;
-        while(prev != NULL && prev->next != del)
+        while(prev != NULL && prev->next != del) {
             prev = prev->next;
+        }
 
-        if(prev == NULL) return;
+        if(prev == NULL) {
+            return false;
+        }
+
         prev->next =  del->next;
         delete del;
+        // must, if del is the head, and there's only one element
         head = dummy.next;
+        return true;
     }
 }
 
@@ -210,10 +223,13 @@ ListNode* detectCycle(ListNode *head){
 
 //************************************************************
 ListNode* lastKth(ListNode *head, int k){
-    if(head == NULL) return NULL;
+    if(head == NULL) {
+        return NULL;
+    }
+
     int cnt = 0;
     ListNode *fast = head, *slow = head;
-    while(fast != NULL){
+    while(fast != NULL) {
         fast = fast->next;
         cnt++;
         if(cnt > k){
@@ -242,5 +258,14 @@ int main()
     printList(nh2);
     reverse_recur(nh2, nh2);
     printList(nh2);
+
+    int k = 4;
+    ListNode *tmp = KthToLast(nh2, k);
+    if (tmp == NULL) {
+        cout << k << "th to last NULL" <<endl;
+    } else {
+        cout << k << "th to last value: " << tmp->val << endl;
+    }
+
     return 0;
 }

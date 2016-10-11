@@ -1,6 +1,8 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include <cmath>
+#include <unordered_map>
 using namespace std;
 
 //given a array, get all permutations; no duplicates in the array
@@ -111,6 +113,7 @@ string getPermutation(int n, int k){
 }
 
 //************************************************************
+//Combination,  is also subsets
 //http://answer.ninechapter.com/solutions/subsets/
 //no duplicates in number
 void subsets_helper(vector<int> &num, vector<vector<int> > &result, vector<int> &path, int pos){
@@ -235,7 +238,8 @@ vector<string> grayCode(int n){
 }
 
 //********************************************************************************
-void printMatrix(vector<vector<int> > matrix){
+template <typename T>
+void printMatrix(vector<vector<T> > matrix){
     for(int i = 0; i < matrix.size(); ++i){
         for(int j = 0; j < matrix[i].size(); ++j){
             cout<<matrix[i][j] <<" ";
@@ -244,16 +248,170 @@ void printMatrix(vector<vector<int> > matrix){
     }
 }
 
-int main(){
-    int a[] = {10, 1, 2, 7, 6, 1, 5};
-    const int n = sizeof(a) / sizeof(a[0]);
-    vector<int> num(a, a + n);
-    vector<vector<int> > res = combinationSum(num, 8);
-    for(int i = 0; i < res.size(); ++i){
-        for(int j = 0; j < res[i].size(); ++j){
-            cout<<res[i][j] <<" ";
+//**************************** Problems *****************************************
+/* permutation of a string
+PROBLEM: Implement a routine that prints all possible orderings of the characters
+in a string. In other words, print all permutations that use all the characters from
+the original string. For example, given the string “hat”, your function should print
+the strings “tha”, “aht”, “tah”, “ath”, “hta”, and “hat”. Treat each character
+in the input string as a distinct character, even if it is repeated. Given the string “aaa”,
+your routine should print “aaa” six times. You may print the permutations in any
+order you choose.
+*/
+void StrPermHelper(string &origin, string intermedian, string path, vector<string> &result) {
+    if (path.size() == origin.size()) {
+        result.push_back(path);
+        return;
+    }
+
+    for (int i = 0; i < intermedian.size(); ++i) {
+        // core, select one in the left
+        path.push_back(intermedian[i]);
+
+        string tmp = intermedian;
+        tmp.erase(i, 1);
+        // pass left to the next round
+        StrPermHelper(origin, tmp, path, result);
+
+        // core
+        path.pop_back();
+    }
+}
+
+vector<string> StrPerm(string str) {
+    vector<string> result;
+    string path;
+    StrPermHelper(str, str, path, result);
+    return result;
+}
+
+/* Combination of a string
+POBLEM:
+Implement a function that prints all possible combinations of the
+characters in a string. These combinations range in length from one to the length
+of the string. Two combinations that differ only in ordering of their characters are
+the same combination. In other words, “12” and “31” are different combinations
+from the input string “123”, but “21” is the same as “12”.
+characters in a string. These combinations range in length from one to the length
+of the string. Two combinations that differ only in ordering of their characters are
+the same combination. In other words, “12” and “31” are different combinations
+from the input string “123”, but “21” is the same as “12”. */
+void StrCombHelper(string &origin, int level, string &path, vector<string> &result) {
+    if (path.size() > 0) {
+        result.push_back(path);
+    }
+
+    for (int i = level; i < origin.size(); ++i) {
+        path.push_back(origin[i]);
+        StrCombHelper(origin, i  + 1, path, result);
+        path.pop_back();
+    }
+}
+
+vector<string> StrComb(string str) {
+    vector<string> result;
+    string path;
+
+    StrCombHelper(str, 0, path, result);
+
+    return result;
+}
+
+/* telephone num problem*/
+std::unordered_map<char, string> tel_dict = {{'2', "ABC"},
+                                             {'3', "DEF"},
+                                             {'4', "GHI"},
+                                             {'5', "JKL"},
+                                             {'6', "MNO"},
+                                             {'7', "PRS"},
+                                             {'8', "TUV"},
+                                             {'9', "WXY"}};
+
+char GetCharKey(char tel_key, int place) {
+    return tel_dict[tel_key][place];
+}
+
+void TelWordsHelper(string &tel_num, int level, string path,
+                    vector<string> &result) {
+    if (path.size() == tel_num.size()) {
+        result.push_back(path);
+        cout << "push " << "level: " << level << endl;
+        return;
+    }
+
+    // we don't need for loop here, combination or permutation need, but NOT this
+    // because combination/permutation have their own way to place each element
+    // here we just need to go through all tel_num
+    if (tel_num[level] == '0' || tel_num[level] == '1' || tel_num[level] == '-') {
+        path.push_back(tel_num[level]);
+        TelWordsHelper(tel_num, level + 1, path, result);
+    } else {
+        for (int j = 0; j < 3; ++j) {
+            path.push_back(GetCharKey(tel_num[level], j));
+            TelWordsHelper(tel_num, level + 1, path, result);
+            path.pop_back();
         }
-        cout<<endl;
+    }
+}
+
+vector<string> TelWords(string tel_num) {
+    vector<string> result;
+    string path;
+    TelWordsHelper(tel_num, 0, path, result);
+    return result;
+}
+
+vector<string> TelWordsIterative(string tel_num) {
+    vector<string> result;
+    string path;
+    // get replaced string using place = 1
+    for (int i = 0; i < tel_num.size(); ++i) {
+        if (tel_num[i] == '0' || tel_num[i] == '1' || tel_num[i] == '-') {
+            path.push_back(tel_num[i]);
+        } else {
+            path.push_back(GetCharKey(tel_num[i], 1 - 1));
+        }
+    }
+
+    // this is kinda new way of thinking, new code structure
+    // a while + a for + a state machine
+    while (true) {
+        result.push_back(path);
+
+        for (int i = tel_num.size() - 1; i >= -1; --i) {
+            if (i == -1) {
+                return result;
+            }
+
+            // simple state machine
+            if (path[i] == '0' || path[i] == '1' ||path[i] == '-') {
+                continue;
+            } else if (path[i] == GetCharKey(tel_num[i], 3 - 1)) {
+                // if we have gone all 3 states, we should move to next level,
+                // before move to next level, we need RESET to place 1 state,
+                // because when next level state changes, cur level should also
+                // go through 3 states
+                path[i] = GetCharKey(tel_num[i], 1 - 1);
+                continue;
+            } else if (path[i] == GetCharKey(tel_num[i], 1 - 1)) {
+                path[i] = GetCharKey(tel_num[i], 2 - 1);
+                break;
+            } else if (path[i] == GetCharKey(tel_num[i], 2 - 1)) {
+                path[i] = GetCharKey(tel_num[i], 3 - 1);
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+/***************** test case ************************/
+int main(){
+    string str("2-2");
+    vector<string> result = TelWordsIterative(str);
+    cout << result.size() << endl;
+    for(int i = 0; i < result.size(); ++i) {
+        cout << result[i] << endl;
     }
     cout<<endl;
     return 0;
