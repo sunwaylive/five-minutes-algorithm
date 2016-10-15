@@ -520,22 +520,27 @@ TreeNode* convert2DoubleList(TreeNode *root){
 
 //************************************************************
 //find the first common ancestor of two nodes
-bool isFather(TreeNode *f, TreeNode *s){
-    if(f == NULL) return false;
-    else if(f == s) return true;
-    else return isFather(f->lchild, s) || isFather(f->rchild, s);
+// Lowest Common Ancestor: famouse problem
+// use case: find LCA in classes hierarchy
+bool IsFather(TreeNode *root, TreeNode *sun) {
+    if (root == NULL || sun == NULL) return false;
+    if (root->lchild == sun || root->rchild == sun) return true;
+
+    return IsFather(root->lchild, sun) || IsFather(root->rchild, sun);
 }
 
-void commonAncestor(TreeNode *root, TreeNode *n1, TreeNode *n2, TreeNode *&ans){
-    if(root == NULL || n1 == NULL || n2 == NULL) return ;
+void LCA(TreeNode *root, TreeNode *s1, TreeNode *s2, TreeNode *&ans) {
+    if (root == NULL || s1 == NULL || s2 == NULL)
+        return;
 
-    if(isFather(root, n1) && isFather(root, n2)){
+    // only both father, we need go deeper
+    // if not, recursive process ends
+    if (IsFather(root, s1) && IsFather(root, s2)) {
         ans = root;
-        commonAncestor(root->lchild, n1, n2, ans);
-        commonAncestor(root->rchild, n1, n2, ans);
+        LCA(root->lchild, s1, s2, ans);
+        LCA(root->rchild, s1, s2, ans);
     }
 }
-
 //************************************************************
 //树中两节点间的最大距离
 
@@ -633,9 +638,22 @@ int getMaxDist(TreeNode *root){
 
 //************************************************************
 
+
 int main()
 {
-    TreeNode *bst = createBST();
-    cout<<getMaxDist(bst) <<endl;
+    //ifstream in("input.txt");
+    //cin.rdbuf(in.rdbuf());
+
+    TreeNode *root = createTree();
+    preOrder(root);
+    cout << endl;
+
+    TreeNode *s1 = root->lchild->lchild;
+    TreeNode *s2 = root->lchild->rchild;
+    TreeNode *ans = NULL;
+    LCA(root, s1, s2, ans);
+    cout << ans->val << endl;
+
+    //in.close();
     return 0;
 }
