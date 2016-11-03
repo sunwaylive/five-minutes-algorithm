@@ -324,12 +324,13 @@ bool isValidBST(TreeNode* root){
 }
 
 //************************************************************
-int isBalancedHelper(TreeNode *root, bool &is_balanced){
+// 修改一下GetHeight的函数，加入平衡的返回结果作为参数即可
+int GetHeight(TreeNode *root, bool &is_balanced){
     if(root == NULL) return 0;
     if(!is_balanced) return 0;
 
-    int lh = isBalancedHelper(root->lchild, is_balanced);
-    int rh = isBalancedHelper(root->rchild, is_balanced);
+    int lh = GetHeight(root->lchild, is_balanced);
+    int rh = GetHeight(root->rchild, is_balanced);
     if(!is_balanced) return 0;//if is_balanced has been change in above two lines
     is_balanced = abs(lh - rh) <= 1;
     return max(lh, rh) + 1;
@@ -337,7 +338,7 @@ int isBalancedHelper(TreeNode *root, bool &is_balanced){
 
 bool isBalanced(TreeNode *root){
     bool is_balanced = true;
-    isBalancedHelper(root, is_balanced);
+    GetHeight(root, is_balanced);
     return is_balanced;
 }
 

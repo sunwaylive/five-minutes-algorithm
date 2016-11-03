@@ -3,13 +3,14 @@
 #include <queue>
 using namespace std;
 
-const int VN = 3;
+const int VN = 4;
 
 class Graph{
 public:
     Graph();
     void addEdge(int start, int end, int weight);
     void bfs();
+    int bfs_path_length(int start, int end);
     void dfs();
     void topoSort();
 public:
@@ -29,6 +30,7 @@ Graph::Graph(){
 
 void Graph::addEdge(int start, int end, int weight){
     edge[start][end] = weight;//if unordered, we should add symmetric edge
+    edge[end][start] = weight;//if unordered, we should add symmetric edge
     inDegree[end]++;
 }
 
@@ -57,7 +59,49 @@ void Graph::bfs(){
             }
         }
     }
-    delete visited;
+    delete[] visited;
+}
+
+int Graph::bfs_path_length(int start, int end) {
+    bool *visited = new bool[VN];
+    for (int i = 0; i < VN; ++i) {
+        visited[i] = false;
+    }
+
+    queue<int> que;
+    que.push(start);
+    int path = 0;
+    while (!que.empty()) {
+        int level_size = que.size();
+        for (int l = 0; l < level_size; ++l) {
+            int p = que.front();
+            que.pop();
+            cout << "pop p = " << p << endl;
+            if (p == end) {
+                return path;
+            }
+
+            visited[p] = true;
+
+            for (int j = 0; j < VN; ++j) {
+                cout << "all j: " << j << endl;
+                if (edge[p][j] != INT_MAX && !visited[j]) {
+                    cout << "conn, p = " << p << " j = " << j << endl;
+                    if (j == end) {
+                        return path + 1;
+                    }
+
+                    que.push(j);
+                    cout << "push j = " << j << endl;
+                }
+            }
+        }
+
+        path++;
+    }
+
+    delete[] visited;
+    return -1;
 }
 
 void Graph::dfs(){
@@ -83,7 +127,7 @@ void Graph::dfs(){
             }
         }
     }
-    delete visited;
+    delete[] visited;
 }
 
 void Graph::topoSort(){
@@ -113,20 +157,16 @@ void Graph::topoSort(){
             }//end while
         }//end if
     }//end for
-    delete visited;
+
+    delete[] visited;
 }
 
 int main(){
     Graph g;
     g.addEdge(0, 1, 0);
-    g.addEdge(2, 1, 0);
-    g.addEdge(0, 2, 0);
-    //g.addEdge(1, 2, 0);
-    g.bfs();
-    cout<<endl;
-    g.dfs();
-    cout<<endl;
-    g.topoSort();
-    cout<<endl;
+    g.addEdge(1, 2, 0);
+    g.addEdge(2, 3, 0);
+    g.addEdge(3, 0, 0);
+    cout << g.bfs_path_length(0, 3) << endl;
     return 0;
 }
