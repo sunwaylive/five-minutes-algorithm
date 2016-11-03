@@ -268,6 +268,7 @@ void radix_counting_sort(int *a, int n, int radius_max, int d){
     for(int i = 1; i <= radius_max; ++i)
         count[i]+= count[i - 1];
 
+    // from end to start to ensure stable
     for(int i = n - 1; i >= 0; --i){
         int digit = (a[i] >> (d - 1)) & 0x1;
         b[count[digit] - 1] = a[i];

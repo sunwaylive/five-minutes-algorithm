@@ -24,7 +24,7 @@ void heapDestroy(heap_t *h)
     free(h);
 }
 
-//小根堆的自上往下的筛选算法
+//小根堆的自上往下的筛选算法, 通常在删除最大或者最小值得时候使用
 //h: 堆对象的指针，  start: 开始的结点的索引
 void heap_sift_down(const heap_t *h, const int start)
 {
@@ -44,17 +44,18 @@ void heap_sift_down(const heap_t *h, const int start)
             i = j;
         }
     }//end for
-    h->elems[i] = tmp;
+
+    h->elems[i] = tmp; // 考虑极限情况，直接退出循环，tmp必定是赋值给i号位置
+
     return;
 }
 
-//小根堆的自下往上筛选法
+//小根堆的自下往上筛选法，通常在插入新元素的时候使用
 void heap_sift_up(const heap_t *h, const int start)
 {
-    int j = start;
-    int i = (j - 1) / 2;
+    int j = start, i = 0; // parent = (child - 1) / 2
     const int tmp = h->elems[start];
-    while(i >= 0){
+    for (i = (j - 1) / 2; i >= 0; i = (j - 1) / 2) {
         if(h->elems[i] < tmp){
             break;
         }else{
@@ -63,7 +64,8 @@ void heap_sift_up(const heap_t *h, const int start)
             i = (j - 1) / 2;
         }
     }
-    h->elems[j] = tmp;
+
+    h->elems[j] = tmp; // 考虑极限情况，直接退出循环，tmp必定是赋值给j号位置
 }
 
 void heap_sort(int a[], const int n)

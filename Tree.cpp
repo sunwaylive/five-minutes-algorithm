@@ -1,6 +1,4 @@
-
-
-uuuu#INCLUDEu <iostream>
+#include <iostream>
 #include <queue>
 #include <stack>
 #include <fstream>
@@ -543,6 +541,27 @@ void LCA(TreeNode *root, TreeNode *s1, TreeNode *s2, TreeNode *&ans) {
         LCA(root->rchild, s1, s2, ans);
     }
 }
+
+// an easier case, get the LCA on binary search tree, assume s1->val <= s2->val
+void BSTLCA(TreeNode *root, int small, int big, TreeNode *&ans) {
+    if (root == NULL) {
+        return;
+    }
+
+    while (root != NULL) {
+        if (root->val >= small && root->val <= big) {
+            ans = root;
+            return;
+        } else if (big < root->val) {
+            root = root->lchild;
+        } else if (small > root->val) {
+            root = root->rchild;
+        }
+    }
+
+    return;
+}
+
 //************************************************************
 //树中两节点间的最大距离
 
@@ -645,17 +664,13 @@ int main()
 {
     //ifstream in("input.txt");
     //cin.rdbuf(in.rdbuf());
-
-    TreeNode *root = createTree();
-    preOrder(root);
-    cout << endl;
-
-    TreeNode *s1 = root->lchild->lchild;
-    TreeNode *s2 = root->lchild->rchild;
+    TreeNode *t = createBST();
+    int small = 4, big = 14;
     TreeNode *ans = NULL;
-    LCA(root, s1, s2, ans);
-    cout << ans->val << endl;
-
+    BSTLCA(t, small, big, ans);
+    if (ans != NULL) {
+        cout << ans->val << endl;
+    }
     //in.close();
     return 0;
 }
