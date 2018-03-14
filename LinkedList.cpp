@@ -110,7 +110,7 @@ ListNode* kthNode(ListNode *head, int k){
 
 //************************************************************
 ListNode* findMid(ListNode *head){
-    if(head == NULL && head->next == NULL) return head;
+    if(head == NULL || head->next == NULL) return head;
 
     ListNode *slow = head, *fast = head->next;
     while(fast != NULL && fast->next != NULL){
