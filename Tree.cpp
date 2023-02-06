@@ -659,8 +659,58 @@ int getMaxDist(TreeNode *root){
 }
 
 //************************************************************
+//Trie
+struct TrieNode
+{
+    int data;
+    int count;
+    unordered_map<char, TrieNode*> children;
+    TrieNode() : data(0),count(0), children(unordered_map<char, TrieNode*>()) {}
+};
 
+TrieNode* BuildTrie(vector<string> words)
+{
+    TrieNode* root = new TrieNode();
+    for (string word : words)
+    {
+        TrieNode* cur = root;
+        for (char c : word)
+        {
+            if (cur->children.find(c) == cur->children.end())
+            {
+                cur->children[c] = new TrieNode();
+            }
 
+            cur = cur->children[c];
+            cur->count++;
+        }
+    }
+
+    return root;
+}
+
+//字典树查找前缀出现次数
+int searchPrefix(TrieNode* root, string str)
+{
+    if (root == nullptr || str.length() == 0) return -1;
+
+    TrieNode* cur = root;
+    for (char c : str)
+    {
+        if (cur->children.find(c) == cur->children.end())
+        {
+            return -1;
+        }
+        else
+        {
+            cur = cur->children[c];
+        }
+    }
+
+    return cur->count;
+}
+
+//************************************************************
 int main()
 {
     //ifstream in("input.txt");
