@@ -95,6 +95,42 @@ void heap_sort(int a[], const int n)
     heapDestroy(h);
 }
 
+//updated on Wed Feb 8, 2023
+class SmallHeap
+{
+    bool priorTo(int v1, int v2) { return v1 < v2; }
+    
+    //上浮, 从下往上调整单个元素
+    void swim(vector<int>& heap, int i)
+    {
+        while (i > 0 && priorTo(heap[i], heap[(i-1)/2]))
+        {
+            swap(heap[i], heap[(i-1)/2]);
+            i = (i-1)/2;
+        }
+    }
+    
+    //下沉
+    void sink(vector<int>& heap, int i, int N)
+    {
+        while (2*i+1 <= N)
+        {
+            //拿到更小的child
+            int j = 2*i+1;
+            if (j+1 <= N && priorTo(heap[j+1], heap[j]))
+            {
+                j++;
+            }
+            
+            //父节点小
+            if(priorTo(heap[i], heap[j])) break;
+            swap(heap[i], heap[j]);
+            i = j;
+        }
+        
+    }
+}；
+
 int main()
 {
     int a[] = {2, 0, 3, 4, 5, 6, 1, 9, 7, 8};
